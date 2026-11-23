@@ -40,6 +40,18 @@ textarea{min-height:75px;resize:vertical}.row{display:flex;gap:9px;align-items:c
 #professor .prof-note{border:1px solid #80653a;background:#302718;border-radius:12px;padding:12px;color:#f5d9a5;font-size:13px;line-height:1.5}
 @media(max-width:480px){#professor .prof-grid{grid-template-columns:1fr}}
 
+
+/* Professor de Teclado — detector polifônico independente */
+#professor .prof-audio-panel{border:1px solid #32618e;background:#0a1c32;border-radius:14px;padding:14px;margin-top:12px}
+#professor .prof-audio-actions{display:flex;gap:8px;flex-wrap:wrap}
+#professor .prof-audio-actions button{flex:1;min-width:110px}
+#professor .prof-detected{font-size:22px;font-weight:800;color:var(--cyan);letter-spacing:.4px;min-height:30px;overflow-wrap:anywhere}
+#professor .prof-feedback{border-radius:11px;padding:12px;margin-top:10px;background:#10263e;border:1px solid var(--line);line-height:1.5}
+#professor .prof-feedback.good{border-color:#287c61;background:#102d2a}
+#professor .prof-feedback.bad{border-color:#80653a;background:#302718}
+#professor .prof-meter{height:7px;background:#071225;border-radius:20px;overflow:hidden;margin:8px 0}
+#professor .prof-meter span{display:block;height:100%;width:0;background:var(--cyan);transition:width .15s}
+
 </style>
 </head>
 <body>
@@ -86,7 +98,27 @@ textarea{min-height:75px;resize:vertical}.row{display:flex;gap:9px;align-items:c
   <div class="item"><b>3. Correção imediata</b><p>Você receberá o que acertou, o que precisa corrigir e uma explicação objetiva.</p></div>
   <div class="item"><b>4. Dificuldade adaptativa</b><p>O próximo desafio será escolhido conforme o resultado anterior.</p></div>
  </div>
- <div class="prof-note"><b>Etapa inicial — interface pronta.</b><br>Esta atualização cria a área do professor e organiza a avaliação. O reconhecimento de áudio polifônico e a correção automática ainda serão implementados em uma etapa técnica separada. Nenhum teste auditivo será apresentado como funcional antes de essa análise estar pronta.</div>
+
+ <div class="card" id="profPolyphonic">
+  <h3>Etapa 2 — Reconhecimento de acordes</h3>
+  <p>Toque o acorde solicitado no seu teclado. O analisador identifica várias notas simultâneas e compara as classes de notas encontradas com o acorde esperado.</p>
+  <div class="prof-audio-panel">
+   <div class="row">
+    <div><small class="muted">DESAFIO ATUAL</small><div id="profChordName" class="prof-detected">Dó maior</div><small id="profChordNotes" class="muted">Notas esperadas: C · E · G</small></div>
+    <button class="btn" id="profNextChord" type="button">Próximo desafio</button>
+   </div>
+   <div style="margin-top:12px"><small class="muted">SINAL DO MICROFONE</small><div class="prof-meter"><span id="profSignal"></span></div><div id="profPolyStatus" class="muted" role="status">Microfone do professor desligado.</div></div>
+   <div style="margin-top:12px"><small class="muted">NOTAS DETECTADAS</small><div id="profDetectedNotes" class="prof-detected">—</div><small id="profConfidence" class="muted">Aguardando execução.</small></div>
+   <div class="prof-audio-actions" style="margin-top:12px">
+    <button class="btn primary" id="profListen" type="button">Iniciar escuta</button>
+    <button class="btn" id="profEvaluate" type="button" disabled>Avaliar execução</button>
+    <button class="btn" id="profStop" type="button" disabled>Parar</button>
+   </div>
+   <div id="profCorrection" class="prof-feedback" aria-live="polite">Quando o microfone estiver ativo, toque o acorde inteiro e pressione “Avaliar execução”.</div>
+  </div>
+  <p class="muted" style="margin-top:10px">Use o teclado em volume moderado, próximo ao aparelho e em um ambiente silencioso. O detector é experimental: ruído, reverberação e timbre podem afetar a leitura. Ele não altera o detector de nota isolada nem o gravador existentes.</p>
+ </div>
+
 </section>
 
 <section id="inicio" class="tab active">
@@ -245,6 +277,140 @@ $('#micStop').onclick=()=>{if(micRAF)cancelAnimationFrame(micRAF);micRAF=null;if
 let recorder=null,recordChunks=[],recordBlob=null;$('#recordStart').onclick=async()=>{try{let stream=await navigator.mediaDevices.getUserMedia({audio:true});recordChunks=[];recorder=new MediaRecorder(stream);recorder.ondataavailable=e=>{if(e.data.size)recordChunks.push(e.data)};recorder.onstop=()=>{recordBlob=new Blob(recordChunks,{type:recorder.mimeType});$('#recordPlay').disabled=false;$('#recordStatus').textContent='Gravação pronta para reproduzir nesta sessão.';stream.getTracks().forEach(t=>t.stop())};recorder.start();$('#recordStart').disabled=true;$('#recordStop').disabled=false;$('#recordStatus').textContent='Gravando…'}catch(e){$('#recordStatus').textContent='Não foi possível iniciar a gravação. Verifique a permissão do microfone.'}};
 $('#recordStop').onclick=()=>{if(recorder&&recorder.state!=='inactive')recorder.stop();$('#recordStart').disabled=false;$('#recordStop').disabled=true};
 $('#recordPlay').onclick=()=>{if(recordBlob){let u=URL.createObjectURL(recordBlob),a=new Audio(u);a.play()}};
+
+// Professor de Teclado: captura e análise polifônica em pipeline próprio.
+// Não reutiliza nem modifica micStream, micAnalyser, micRAF ou o gravador existentes.
+(()=>{
+ const $p=id=>document.getElementById(id);
+ const challenges=[
+  {name:'Dó maior',notes:[0,4,7],labels:['C','E','G']},
+  {name:'Sol maior',notes:[7,11,2],labels:['G','B','D']},
+  {name:'Lá menor',notes:[9,0,4],labels:['A','C','E']},
+  {name:'Fá maior',notes:[5,9,0],labels:['F','A','C']},
+  {name:'Ré menor',notes:[2,5,9],labels:['D','F','A']},
+  {name:'Mi menor',notes:[4,7,11],labels:['E','G','B']}
+ ];
+ const noteNames=['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'];
+ let challengeIndex=0,stream=null,ctx=null,source=null,analyser=null,raf=null,latest=[],latestStrength=0,frames=0;
+ const challenge=()=>challenges[challengeIndex];
+ function showChallenge(){
+  const c=challenge();
+  $p('profChordName').textContent=c.name;
+  $p('profChordNotes').textContent='Notas esperadas: '+c.labels.join(' · ');
+  $p('profDetectedNotes').textContent='—';
+  $p('profConfidence').textContent='Aguardando execução.';
+  $p('profCorrection').className='prof-feedback';
+  $p('profCorrection').textContent='Toque o acorde inteiro, mantenha as teclas pressionadas por um instante e avalie.';
+ }
+ function stop(){
+  if(raf!==null)cancelAnimationFrame(raf);raf=null;
+  if(source){try{source.disconnect()}catch(e){}source=null}
+  if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
+  if(ctx){ctx.close().catch(()=>{});ctx=null}
+  analyser=null;latest=[];latestStrength=0;frames=0;
+  $p('profListen').disabled=false;$p('profEvaluate').disabled=true;$p('profStop').disabled=true;
+  $p('profSignal').style.width='0%';
+  $p('profPolyStatus').textContent='Microfone do professor desligado.';
+ }
+ function analyzeSpectrum(){
+  if(!analyser||!ctx)return;
+  const db=new Float32Array(analyser.frequencyBinCount);
+  analyser.getFloatFrequencyData(db);
+  const binHz=ctx.sampleRate/analyser.fftSize;
+  let peaks=[];
+  for(let i=2;i<db.length-2;i++){
+   if(db[i]>-78 && db[i]>db[i-1] && db[i]>=db[i+1] && db[i]>db[i-2] && db[i]>=db[i+2]){
+    const a=db[i-1],b=db[i],c=db[i+1];
+    const denom=a-2*b+c;
+    const shift=Math.abs(denom)<.001?0:.5*(a-c)/denom;
+    const freq=(i+shift)*binHz;
+    if(freq>=75&&freq<=1500)peaks.push({freq,level:b});
+   }
+  }
+  peaks.sort((a,b)=>b.level-a.level);
+  const fundamentals=[];
+  for(const peak of peaks){
+   // Descarta picos que sejam harmônicos inteiros de uma fundamental mais forte.
+   const harmonic=fundamentals.some(f=>{
+    const ratio=peak.freq/f.freq,nearest=Math.round(ratio);
+    return nearest>=2&&nearest<=6&&Math.abs(ratio-nearest)<.035;
+   });
+   if(!harmonic)fundamentals.push(peak);
+   if(fundamentals.length>=12)break;
+  }
+  if(!fundamentals.length){latest=[];latestStrength=0;$p('profDetectedNotes').textContent='Nenhuma nota identificada';$p('profConfidence').textContent='Toque notas simultâneas com mais clareza.';return}
+  const top=fundamentals[0].level;
+  const chosen=fundamentals.filter(f=>f.level>=top-22).slice(0,6);
+  const unique=[];
+  for(const f of chosen){
+   const midi=Math.round(69+12*Math.log2(f.freq/440));
+   if(midi<28||midi>96)continue;
+   const pc=((midi%12)+12)%12;
+   if(!unique.some(n=>n.pc===pc))unique.push({pc,midi,freq:f.freq,level:f.level});
+  }
+  unique.sort((a,b)=>a.midi-b.midi);
+  latest=unique;latestStrength=Math.max(0,Math.min(100,(top+85)*2.3));
+  $p('profSignal').style.width=latestStrength+'%';
+  $p('profDetectedNotes').textContent=unique.length?unique.map(n=>noteNames[n.pc]).join(' · '):'—';
+  $p('profConfidence').textContent=unique.length+' classe(s) de nota detectada(s) · leitura espectral experimental';
+ }
+ function loop(){
+  if(!analyser)return;
+  analyzeSpectrum();frames++;
+  if(frames%4===0)$p('profPolyStatus').textContent='Escutando seu teclado… mantenha o acorde pressionado.';
+  raf=requestAnimationFrame(loop);
+ }
+ $p('profListen').addEventListener('click',async()=>{
+  try{
+   if(!window.isSecureContext)throw new Error('Abra o aplicativo pelo endereço HTTPS.');
+   if(!navigator.mediaDevices?.getUserMedia)throw new Error('Este navegador não disponibiliza acesso ao microfone.');
+   if(stream)stop();
+   $p('profPolyStatus').textContent='Solicitando acesso ao microfone…';
+   stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false},video:false});
+   const AC=window.AudioContext||window.webkitAudioContext;
+   if(!AC)throw new Error('Web Audio API indisponível neste navegador.');
+   ctx=new AC({latencyHint:'interactive'});
+   if(ctx.state==='suspended')await ctx.resume();
+   source=ctx.createMediaStreamSource(stream);
+   analyser=ctx.createAnalyser();analyser.fftSize=16384;analyser.smoothingTimeConstant=.18;analyser.minDecibels=-100;analyser.maxDecibels=-20;
+   source.connect(analyser);
+   $p('profListen').disabled=true;$p('profEvaluate').disabled=false;$p('profStop').disabled=false;
+   $p('profPolyStatus').textContent='Microfone ativo. Toque o acorde solicitado.';
+   $p('profCorrection').textContent='Ouvindo… toque todas as notas do acorde ao mesmo tempo.';
+   loop();
+  }catch(e){
+   stop();
+   $p('profPolyStatus').textContent='Não foi possível iniciar: '+(e.message||'erro de microfone');
+   $p('profCorrection').textContent='Verifique a permissão do microfone e se outro aplicativo está usando o dispositivo.';
+  }
+ });
+ $p('profEvaluate').addEventListener('click',()=>{
+  const found=[...new Set(latest.map(n=>n.pc))],expected=challenge().notes;
+  if(found.length<2||latestStrength<7){
+   $p('profCorrection').className='prof-feedback bad';
+   $p('profCorrection').textContent='Ainda não consegui identificar notas suficientes. Toque o acorde completo, mantenha as teclas pressionadas e tente novamente.';
+   return;
+  }
+  const correct=expected.filter(n=>found.includes(n)),missing=expected.filter(n=>!found.includes(n)),extra=found.filter(n=>!expected.includes(n));
+  const percent=Math.round(correct.length/expected.length*100);
+  const exact=missing.length===0&&extra.length===0;
+  $p('profCorrection').className='prof-feedback '+(exact?'good':'bad');
+  if(exact){
+   $p('profCorrection').innerHTML='<b>Correto! Você executou '+challenge().name+'.</b><br>O detector identificou as três classes de notas esperadas: '+challenge().labels.join(' · ')+'.';
+  }else{
+   let msg='<b>Vamos corrigir juntos.</b><br>Notas identificadas: '+found.map(n=>noteNames[n]).join(' · ')+'.';
+   if(missing.length)msg+='<br>Não consegui confirmar: '+missing.map(n=>noteNames[n]).join(' · ')+'.';
+   if(extra.length)msg+='<br>Notas adicionais detectadas: '+extra.map(n=>noteNames[n]).join(' · ')+'.';
+   msg+='<br>Correspondência parcial: '+percent+'%. Confira as teclas e tente novamente.';
+   $p('profCorrection').innerHTML=msg;
+  }
+ });
+ $p('profNextChord').addEventListener('click',()=>{challengeIndex=(challengeIndex+1)%challenges.length;showChallenge()});
+ $p('profStop').addEventListener('click',stop);
+ window.addEventListener('pagehide',stop);
+ showChallenge();
+})();
+
 if('serviceWorker'in navigator&&location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 </script>
 </body></html>
