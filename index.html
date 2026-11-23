@@ -53,33 +53,38 @@ textarea{min-height:75px;resize:vertical}.row{display:flex;gap:9px;align-items:c
 #professor .prof-meter span{display:block;height:100%;width:0;background:var(--cyan);transition:width .15s}
 
 
-/* Organização da trilha modular — estilos isolados */
-#professor .prof-section-head,#professor .prof-workspace-top,#professor .prof-quiz-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-#professor .prof-module-card{background:#091a30;border:1px solid var(--line);border-radius:13px;padding:13px;min-width:0}
-#professor .prof-module-card h4{margin:7px 0 5px;font-size:15px}
-#professor .prof-module-card p{font-size:12px;line-height:1.45;color:var(--muted);min-height:36px}
-#professor .prof-module-card .prof-module-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:8px 0;font-size:11px;color:var(--muted)}
-#professor .prof-module-card button{width:100%;margin-top:8px}
-#professor .prof-module-workspace{margin-top:16px;padding-top:15px;border-top:1px solid var(--line)}
-#professor .prof-lesson{line-height:1.6;font-size:14px;margin:12px 0}
-#professor .prof-lesson h4{margin:12px 0 5px;color:var(--cyan)}
-#professor .prof-lesson ul{padding-left:20px}
-#professor .prof-practice{padding:12px;border:1px solid var(--line);border-radius:12px;background:#0a1c32;margin:12px 0}
-#professor .prof-practice p{margin:5px 0 0;font-size:13px;line-height:1.5}
-#professor .prof-quiz-head{margin:16px 0 10px}
-#professor .prof-question{font-weight:700;margin:10px 0}
-#professor .prof-option{display:flex;gap:9px;align-items:flex-start;padding:11px;border:1px solid var(--line);border-radius:10px;margin:7px 0;cursor:pointer;font-size:13px}
-#professor .prof-option:has(input:checked){border-color:var(--cyan);background:#10263e}
-#professor .prof-option input{margin-top:2px;accent-color:var(--cyan)}
-#professor .prof-module-card .prof-small-track{height:5px;background:#071225;border-radius:20px;overflow:hidden;margin-top:8px}
-#professor .prof-module-card .prof-small-track span{display:block;height:100%;background:var(--good)}
+/* Professor: trilha didática modular */
+#professor .academy-shell{display:grid;gap:12px}
+#professor .academy-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+#professor .academy-select{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#professor .academy-module{border:1px solid var(--line);background:#0a1b30;border-radius:12px;padding:11px;text-align:left;color:var(--text);cursor:pointer}
+#professor .academy-module.active{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan) inset}
+#professor .academy-module.done{border-color:#287c61}
+#professor .academy-module small{display:block;color:var(--muted);margin-top:4px}
+#professor .academy-content{border:1px solid var(--line);border-radius:13px;padding:14px;background:#091a30}
+#professor .academy-content h4{margin:0 0 8px}
+#professor .academy-lesson{padding:11px;border-radius:10px;background:#10263e;margin:9px 0;line-height:1.55}
+#professor .academy-lesson p{margin:6px 0}
+#professor .academy-example{border-left:3px solid var(--cyan);padding:8px 10px;background:#0c2238;margin:8px 0;font-size:13px;line-height:1.5}
+#professor .academy-question{border-top:1px solid var(--line);padding:12px 0}
+#professor .academy-question label{display:flex;gap:8px;align-items:flex-start;padding:7px;border-radius:8px;cursor:pointer}
+#professor .academy-question label:has(input:checked){background:#173451}
+#professor .academy-result{padding:12px;border-radius:10px;background:#10263e;margin-top:10px;line-height:1.5}
+#professor .academy-result.good{border:1px solid #287c61}
+#professor .academy-result.bad{border:1px solid #80653a}
+#professor .academy-progress{height:8px;background:#071225;border-radius:20px;overflow:hidden}
+#professor .academy-progress span{display:block;height:100%;background:var(--good);width:0}
+#professor .academy-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+#professor .academy-actions button{flex:1;min-width:130px}
+#professor .academy-muted{color:var(--muted);font-size:12px}
+@media(max-width:480px){#professor .academy-select{grid-template-columns:1fr}}
 
 </style>
 </head>
 <body>
 <header><div class="eyebrow">Seu laboratório musical</div><h1>Piano Assistant</h1><p>Teoria, prática, repertório e evolução — no seu ritmo.</p></header>
 <nav aria-label="Navegação principal">
-<button class="active" data-tab="inicio">Início</button><button data-tab="professor">Professor</button><button data-tab="teoria">Teoria</button><button data-tab="ferramentas">Ferramentas</button><button data-tab="repertorio">Repertório</button><button data-tab="progresso">Progresso</button>
+<button class="active" data-tab="inicio">Início</button><button data-tab="teoria">Teoria</button><button data-tab="repertorio">Repertório</button><button data-tab="progresso">Progresso</button><button data-tab="ferramentas">Ferramentas</button><button data-tab="professor">Professor</button>
 </nav>
 <main>
 
@@ -95,25 +100,22 @@ textarea{min-height:75px;resize:vertical}.row{display:flex;gap:9px;align-items:c
   <div class="stats">
    <div class="stat"><strong id="profLevel">A definir</strong><small>Nível atual</small></div>
    <div class="stat"><strong id="profProgress">0/6</strong><small>Módulos avaliados</small></div>
-   <div class="stat"><strong id="profAccuracy">—</strong><small>Média das avaliações</small></div>
-   <div class="stat"><strong id="profExercises">0</strong><small>Avaliações concluídas</small></div>
+   <div class="stat"><strong id="profAccuracy">—</strong><small>Precisão geral</small></div>
+   <div class="stat"><strong id="profExercises">0</strong><small>Exercícios concluídos</small></div>
   </div>
   <div class="prof-track"><span id="profProgressBar"></span></div>
   <p class="muted" id="profSummary">Sua avaliação ainda não começou. Os resultados serão registrados conforme os módulos forem concluídos.</p>
  </div>
- <div class="card" id="profLearning">
-  <div class="prof-section-head"><div><span class="eyebrow">TRILHA DE APRENDIZADO</span><h3>Seus módulos</h3></div><span class="pill">6 etapas</span></div>
-  <p>Estude um assunto por vez. Cada módulo tem uma aula resumida, uma atividade prática e uma avaliação curta. Você pode revisar os módulos quando quiser.</p>
-  <div id="profModuleGrid" class="prof-grid" aria-label="Módulos de estudo"></div>
-  <div id="profModuleWorkspace" class="prof-module-workspace" hidden aria-live="polite">
-   <div class="prof-workspace-top"><div><span id="profModuleKicker" class="prof-number"></span><h3 id="profModuleTitle"></h3></div><button class="btn" id="profBackModules" type="button">Todos os módulos</button></div>
-   <div id="profModuleLesson" class="prof-lesson"></div>
-   <div class="prof-practice"><b>Atividade prática</b><p id="profModulePractice"></p></div>
-   <div class="prof-quiz-head"><div><b>Verificação de aprendizagem</b><small id="profQuizCount" class="muted">Questão 1 de 3</small></div><span id="profQuizScore" class="pill">Ainda não avaliado</span></div>
-   <div id="profQuizArea"></div>
-   <div class="prof-audio-actions" style="margin-top:12px"><button class="btn primary" id="profCheckAnswer" type="button">Conferir resposta</button><button class="btn" id="profNextQuestion" type="button" disabled>Próxima questão</button></div>
-   <div id="profQuizFeedback" class="prof-feedback" aria-live="polite">Leia a questão, escolha uma alternativa e confira sua resposta.</div>
-   <button class="btn" id="profRetakeModule" type="button" hidden>Refazer avaliação</button>
+ <div class="card">
+  <h3>Trilha de avaliação</h3>
+  <p>Os módulos serão liberados em sequência. O nível de dificuldade poderá subir ou descer conforme seu desempenho.</p>
+  <div class="prof-grid">
+   <div class="prof-module"><span class="prof-number">MÓDULO 01</span><strong>Notas musicais</strong><p>Notas naturais, sustenidos, bemóis e reconhecimento de alturas.</p><span class="pill">Fundamentos</span></div>
+   <div class="prof-module"><span class="prof-number">MÓDULO 02</span><strong>Intervalos e acordes</strong><p>Distâncias, tríades, tétrades, inversões e identificação de notas simultâneas.</p><span class="pill">Harmonia básica</span></div>
+   <div class="prof-module"><span class="prof-number">MÓDULO 03</span><strong>Escalas e tonalidades</strong><p>Escalas maiores e menores, graus, armaduras e campos harmônicos.</p><span class="pill">Teoria aplicada</span></div>
+   <div class="prof-module"><span class="prof-number">MÓDULO 04</span><strong>Harmonia</strong><p>Progressões, funções, cadências e relações entre acordes.</p><span class="pill">Construção musical</span></div>
+   <div class="prof-module"><span class="prof-number">MÓDULO 05</span><strong>Execução prática</strong><p>Precisão, coordenação das mãos, ritmo e continuidade.</p><span class="pill">Técnica</span></div>
+   <div class="prof-module"><span class="prof-number">MÓDULO 06</span><strong>Aplicação musical</strong><p>Leitura, sequências e aplicação dos conhecimentos em pequenos trechos.</p><span class="pill">Integração</span></div>
   </div>
  </div>
  <div class="card">
@@ -122,6 +124,22 @@ textarea{min-height:75px;resize:vertical}.row{display:flex;gap:9px;align-items:c
   <div class="item"><b>2. Você executa no teclado</b><p>O sistema deverá captar o som e analisar notas isoladas ou simultâneas.</p></div>
   <div class="item"><b>3. Correção imediata</b><p>Você receberá o que acertou, o que precisa corrigir e uma explicação objetiva.</p></div>
   <div class="item"><b>4. Dificuldade adaptativa</b><p>O próximo desafio será escolhido conforme o resultado anterior.</p></div>
+ </div>
+
+
+ <div class="card academy-shell" id="profAcademy">
+  <div class="academy-head"><div><h3>Escola de Teclado · Formação completa</h3><p class="muted">Seis módulos independentes. Estude a aula, pratique e faça a avaliação de cada etapa.</p></div><span class="pill" id="academyOverall">0/6 concluídos</span></div>
+  <div class="academy-progress"><span id="academyOverallBar"></span></div>
+  <div class="academy-select" id="academyModuleList" aria-label="Selecionar módulo"></div>
+  <div class="academy-content">
+   <div class="academy-head"><div><span class="prof-number" id="academyModuleKicker">MÓDULO 01</span><h3 id="academyTitle">Notas musicais</h3></div><span class="pill" id="academyStatus">Não iniciado</span></div>
+   <p id="academyGoal" class="muted"></p>
+   <div id="academyLessons"></div>
+   <div class="academy-lesson"><h4>Prática orientada</h4><div id="academyPractice"></div></div>
+   <div class="academy-lesson"><h4>Avaliação do módulo</h4><p class="academy-muted">Responda às cinco questões. A correção explica o motivo de cada resposta.</p><div id="academyQuiz"></div><button class="btn primary" id="academyGrade" type="button">Corrigir avaliação</button><div id="academyFeedback" aria-live="polite"></div></div>
+   <div class="academy-actions"><button class="btn" id="academyPrev" type="button">Módulo anterior</button><button class="btn primary" id="academyNext" type="button">Próximo módulo</button></div>
+  </div>
+  <p class="academy-muted">O progresso fica salvo neste aparelho. Para exercícios de execução, use seu teclado físico; a lista de verificação é uma autoavaliação, não uma medição automática de técnica ou ritmo.</p>
  </div>
 
  <div class="card" id="profPolyphonic">
@@ -303,6 +321,155 @@ let recorder=null,recordChunks=[],recordBlob=null;$('#recordStart').onclick=asyn
 $('#recordStop').onclick=()=>{if(recorder&&recorder.state!=='inactive')recorder.stop();$('#recordStart').disabled=false;$('#recordStop').disabled=true};
 $('#recordPlay').onclick=()=>{if(recordBlob){let u=URL.createObjectURL(recordBlob),a=new Audio(u);a.play()}};
 
+
+// Escola modular do Professor: conteúdo, prática guiada e avaliações independentes.
+// Não acessa APIs de áudio, streams, detector antigo ou gravador.
+(()=>{
+ const root=document.getElementById('profAcademy'); if(!root)return;
+ const $=id=>document.getElementById(id);
+ const modules=[
+ {title:'Notas musicais',level:'Fundamentos',goal:'Reconhecer as notas no sistema musical, compreender acidentes e localizar alturas e oitavas no teclado.',
+ lessons:[
+ ['1. As sete notas naturais','A sequência básica é Dó, Ré, Mi, Fá, Sol, Lá e Si. Depois de Si, a sequência recomeça em Dó, uma oitava acima.','No teclado, as teclas brancas repetem esse ciclo. Use os grupos de duas e três teclas pretas para se orientar: o Dó fica imediatamente à esquerda do grupo de duas pretas.'],
+ ['2. Semitom e tom','Semitom é a menor distância usual entre duas teclas adjacentes do teclado. Tom equivale a dois semitons.','Mi–Fá e Si–Dó são semitons naturais. Dó–Ré e Fá–Sol são tons.'],
+ ['3. Sustenido, bemol e bequadro','Sustenido (#) eleva a nota em um semitom; bemol (♭) abaixa em um semitom; bequadro cancela um acidente anterior.','Dó♯ e Ré♭ têm a mesma altura no teclado temperado, mas nomes diferentes conforme a função musical: são enarmônicos.'],
+ ['4. Oitavas e frequência','Uma oitava separa duas notas com o mesmo nome e frequências em proporção 2:1. A nota mais aguda tem o dobro da frequência da mais grave.','Dó4 e Dó5 pertencem à mesma classe de nota, mas ocupam registros diferentes.']
+ ],practice:'<ol><li>Localize todos os Dós do seu teclado usando os grupos de duas teclas pretas.</li><li>Toque a sequência Dó–Ré–Mi–Fá–Sol–Lá–Si–Dó, falando os nomes.</li><li>Escolha uma nota e encontre seu sustenido ou bemol equivalente quando existir.</li><li>Toque a mesma nota em duas oitavas diferentes.</li></ol>',
+ qs:[
+ ['Qual sequência representa as sete notas naturais?',['Dó, Ré, Mi, Fá, Sol, Lá, Si','Dó, Ré, Mi, Sol, Lá, Si, Dó','A, C, D, E, F, G, H'],0,'A sequência natural tem sete nomes e reinicia em Dó após Si.'],
+ ['Qual é a distância de um semitom?',['Duas teclas brancas','Uma tecla adjacente no teclado','Uma oitava'],1,'No teclado, semitom é a menor distância entre duas teclas adjacentes.'],
+ ['Qual par forma um semitom natural?',['Dó–Ré','Fá–Sol','Mi–Fá'],2,'Mi e Fá são teclas adjacentes; não há tecla preta entre elas.'],
+ ['O que faz o sustenido?',['Eleva a nota em um semitom','Abaixa a nota em um semitom','Dobra a frequência'],0,'O sustenido eleva a altura em um semitom.'],
+ ['O que é uma oitava?',['Sete semitons','Duas notas com mesmo nome em registros diferentes','Duas notas sempre simultâneas'],1,'Uma oitava liga notas com o mesmo nome em registros diferentes.']
+ ]},
+ {title:'Intervalos e acordes',level:'Harmonia básica',goal:'Medir distâncias entre notas e compreender como intervalos formam tríades e tétrades.',
+ lessons:[
+ ['1. Intervalo musical','Intervalo é a distância entre duas alturas. Pode ser medido em semitons e classificado por número e qualidade.','Dó–Mi tem quatro semitons: terça maior. Dó–Sol tem sete semitons: quinta justa.'],
+ ['2. Classificação essencial','Uníssono = 0; segunda menor = 1; segunda maior = 2; terça menor = 3; terça maior = 4; quarta justa = 5; trítono = 6; quinta justa = 7 semitons.','A contagem em semitons ajuda a identificar o som, mas a grafia das notas também determina o nome intervalar.'],
+ ['3. Tríades','Uma tríade reúne fundamental, terça e quinta. Maior: 0–4–7; menor: 0–3–7; diminuta: 0–3–6; aumentada: 0–4–8.','Dó maior = Dó–Mi–Sol. Dó menor = Dó–Mi♭–Sol.'],
+ ['4. Tétrades e inversões','Tétrades acrescentam uma sétima à tríade. Inverter um acorde muda a nota do baixo e a disposição, não a identidade básica das notas.','Dó maior: posição fundamental Dó–Mi–Sol; primeira inversão Mi–Sol–Dó; segunda inversão Sol–Dó–Mi.']
+ ],practice:'<ol><li>Toque Dó e depois Mi; ouça a terça maior.</li><li>Compare Dó–Mi com Dó–Mi♭.</li><li>Monte Dó maior e Dó menor.</li><li>Toque Dó maior nas três posições e perceba como o baixo muda.</li><li>Monte Sol–Si–Ré e identifique a tríade.</li></ol>',
+ qs:[
+ ['Quantos semitons há em uma terça maior?',['3','4','5'],1,'A terça maior possui quatro semitons.'],
+ ['Qual fórmula representa uma tríade menor?',['0–3–7','0–4–7','0–4–8'],0,'A tríade menor tem terça menor (3) e quinta justa (7).'],
+ ['Quais notas formam Dó maior?',['Dó–Mi♭–Sol','Dó–Mi–Sol','Dó–Fá–Lá'],1,'Dó maior é formado por fundamental, terça maior e quinta justa.'],
+ ['Na primeira inversão de Dó maior, qual nota fica no baixo?',['Dó','Sol','Mi'],2,'A primeira inversão coloca a terça, Mi, no baixo.'],
+ ['O que muda em uma inversão?',['A nota do baixo e a disposição','A tonalidade obrigatoriamente','A quantidade de notas da tríade'],0,'A inversão reorganiza as mesmas notas do acorde.']
+ ]},
+ {title:'Escalas e tonalidades',level:'Teoria aplicada',goal:'Construir escalas maiores e menores, identificar graus e compreender a relação entre tonalidade e campo harmônico.',
+ lessons:[
+ ['1. Escala maior','A escala maior segue a fórmula de tons e semitons: T–T–S–T–T–T–S.','Dó maior: Dó, Ré, Mi, Fá, Sol, Lá, Si, Dó.'],
+ ['2. Escala menor natural','A menor natural segue T–S–T–T–S–T–T.','Lá menor natural: Lá, Si, Dó, Ré, Mi, Fá, Sol, Lá.'],
+ ['3. Graus da escala','Cada nota recebe um grau: I, II, III, IV, V, VI e VII. Os graus ajudam a descrever acordes e funções sem depender de uma tonalidade específica.','Em Dó maior, Sol é o quinto grau (V); em Sol maior, Ré é o quinto grau.'],
+ ['4. Armadura e relativo','A armadura indica sustenidos ou bemóis recorrentes. Uma tonalidade maior e sua relativa menor compartilham a mesma armadura: Dó maior e Lá menor, por exemplo.','A relativa menor começa no sexto grau da escala maior.']
+ ],practice:'<ol><li>Toque Dó maior subindo e descendo, respeitando a sequência de tons e semitons.</li><li>Toque Lá menor natural.</li><li>Identifique o quinto grau de Dó maior e de Sol maior.</li><li>Compare as notas de Dó maior e Lá menor.</li></ol>',
+ qs:[
+ ['Qual é a fórmula da escala maior?',['T–S–T–T–S–T–T','T–T–S–T–T–T–S','T–T–T–S–T–T–S'],1,'A escala maior segue T–T–S–T–T–T–S.'],
+ ['Qual nota é o quinto grau de Dó maior?',['Fá','Lá','Sol'],2,'Contando Dó como I, Sol é o V grau.'],
+ ['Qual é a relativa menor de Dó maior?',['Lá menor','Ré menor','Mi menor'],0,'Lá menor compartilha a armadura de Dó maior.'],
+ ['Qual sequência descreve a menor natural?',['T–T–S–T–T–T–S','T–S–T–T–S–T–T','S–T–T–S–T–T–T'],1,'A menor natural segue T–S–T–T–S–T–T.'],
+ ['Para que servem os graus da escala?',['Para indicar a posição e função das notas','Para determinar o volume','Para indicar a duração de cada tecla'],0,'Os graus numeram as notas em relação à tônica.']
+ ]},
+ {title:'Harmonia',level:'Construção musical',goal:'Entender como os acordes se relacionam, reconhecer funções harmônicas e analisar progressões e cadências.',
+ lessons:[
+ ['1. Campo harmônico maior','Harmonizando uma escala maior em tríades, a sequência de qualidades é: maior, menor, menor, maior, maior, menor, diminuto.','Em Dó maior: C, Dm, Em, F, G, Am, Bdim.'],
+ ['2. Funções harmônicas','Tônica (T) transmite repouso; subdominante (S) cria afastamento/preparação; dominante (D) gera tensão e tende a resolver na tônica.','Em Dó maior, C costuma exercer função de tônica, F de subdominante e G ou G7 de dominante.'],
+ ['3. Progressões','Progressão é uma sequência de acordes. Os graus romanos permitem transpor o mesmo desenho para outras tonalidades.','I–V–vi–IV em Dó maior: C–G–Am–F. Em Sol maior: G–D–Em–C.'],
+ ['4. Cadências','Cadências são movimentos harmônicos que articulam repouso, conclusão ou continuidade. V–I é uma resolução dominante–tônica forte no sistema tonal.','Em Dó maior, G7–C é uma cadência autêntica comum.']
+ ],practice:'<ol><li>Toque C–F–G–C e perceba preparação, tensão e resolução.</li><li>Toque I–V–vi–IV em Dó e depois em Sol.</li><li>Identifique a função de cada acorde em C–F–G–C.</li><li>Experimente terminar uma frase em G7 e depois resolver em C.</li></ol>',
+ qs:[
+ ['Qual é a sequência de qualidades do campo harmônico maior em tríades?',['M–m–m–M–M–m–dim','M–M–m–M–m–m–dim','m–m–M–M–m–M–dim'],0,'A sequência é maior, menor, menor, maior, maior, menor, diminuto.'],
+ ['Qual é a função mais associada ao acorde I?',['Dominante','Tônica','Subdominante'],1,'O grau I representa a tônica e o centro de repouso.'],
+ ['Em Dó maior, qual acorde é o V grau?',['Fá maior','Lá menor','Sol maior'],2,'Sol maior é o quinto grau do campo harmônico de Dó.'],
+ ['Qual progressão é I–V–vi–IV em Dó maior?',['C–G–Am–F','C–F–G–Am','Am–F–C–G'],0,'I=C, V=G, vi=Am e IV=F em Dó maior.'],
+ ['Qual movimento exemplifica dominante para tônica em Dó maior?',['F–C','G7–C','Am–F'],1,'G7–C é V7–I, uma resolução dominante–tônica.']
+ ]},
+ {title:'Execução prática',level:'Técnica',goal:'Desenvolver rotina de estudo, postura funcional, coordenação, regularidade rítmica e controle consciente da execução.',
+ lessons:[
+ ['1. Preparação e postura','Sente-se de modo estável, mantenha ombros relaxados e punhos alinhados. Ajuste a distância para alcançar o teclado sem tensão.','A técnica deve ser confortável. Interrompa e ajuste se surgir dor ou desconforto.'],
+ ['2. Independência das mãos','Comece com padrões curtos e lentos. Primeiro compreenda cada mão separadamente; depois combine as partes.','Mão esquerda: toque Dó em semibreves. Mão direita: toque Dó–Ré–Mi–Fá em semínimas. Depois combine lentamente.'],
+ ['3. Pulso e subdivisão','O pulso é a referência regular da música. Subdividir significa organizar partes menores dentro de cada pulso.','Em 4/4, conte 1–2–3–4. Pratique palmas em cada pulso antes de tocar.'],
+ ['4. Consistência e dinâmica','Precisão inclui notas corretas, tempo estável, articulação e controle de intensidade. Aumente a velocidade somente quando o padrão estiver claro e confortável.','Grave pequenas sessões se desejar e compare regularidade e clareza, sem buscar velocidade a qualquer custo.']
+ ],practice:'<ol><li>Faça uma preparação confortável e relaxada.</li><li>Com metrônomo em andamento lento, conte quatro pulsos antes de tocar.</li><li>Pratique cada mão separadamente por um trecho curto.</li><li>Una as mãos em velocidade confortável, mantendo o pulso.</li><li>Use esta autoavaliação: postura confortável, notas corretas, pulso estável, coordenação e continuidade.</li></ol><p><b>Checklist:</b> marque mentalmente cada item após executar. Esta etapa não usa nem altera o microfone.</p>',
+ qs:[
+ ['Qual é a prioridade ao combinar as mãos?',['Tocar o mais rápido possível','Manter coordenação e pulso em velocidade confortável','Aumentar o volume'],1,'A coordenação estável vem antes de aumentar a velocidade.'],
+ ['O que é pulso musical?',['A referência regular de tempo','A nota mais grave','O volume da música'],0,'O pulso organiza a percepção regular do tempo.'],
+ ['Qual estratégia ajuda a aprender uma passagem difícil?',['Repetir sempre no máximo andamento','Separar as mãos e reduzir a dificuldade','Ignorar os erros'],1,'Isolar as partes e praticar lentamente torna o aprendizado mais controlável.'],
+ ['O que fazer se surgir desconforto físico?',['Continuar até terminar','Tocar com mais força','Parar e ajustar postura e atividade'],2,'Desconforto é sinal para interromper e ajustar; não deve ser forçado.'],
+ ['Quando aumentar o andamento?',['Quando a passagem estiver clara e estável','Antes de conhecer as notas','A cada repetição, independentemente dos erros'],0,'Aumente gradualmente quando houver controle e consistência.']
+ ]},
+ {title:'Aplicação musical',level:'Integração',goal:'Aplicar teoria, ouvido, harmonia e execução em acompanhamentos e pequenas análises musicais.',
+ lessons:[
+ ['1. Estrutura musical','Muitas músicas organizam-se em seções como introdução, verso, refrão, ponte e final. Identificar seções ajuda a planejar o acompanhamento.','Observe mudanças de dinâmica, melodia, harmonia e textura para perceber transições.'],
+ ['2. Acompanhamento','Um acompanhamento pode combinar baixo na mão esquerda e acordes na direita, ou distribuir notas de outras formas.','Em C–G–Am–F, experimente tocar a fundamental no baixo e tríades simples na mão direita.'],
+ ['3. Análise por graus','Ao reconhecer a tonalidade, converta os acordes em graus romanos. Isso revela padrões que podem ser transportados para outros tons.','C–G–Am–F em Dó maior equivale a I–V–vi–IV.'],
+ ['4. Criar uma ideia musical','Use uma progressão curta, um ritmo simples e uma melodia original. Varie repetição, dinâmica e registro para criar forma.','Crie quatro compassos usando C–F–G–C e uma melodia própria com notas da escala de Dó maior.']
+ ],practice:'<ol><li>Escolha uma progressão estudada, como C–G–Am–F.</li><li>Toque as fundamentais na mão esquerda e acordes na direita.</li><li>Identifique os graus e as funções harmônicas.</li><li>Crie uma pequena melodia original com notas da tonalidade.</li><li>Organize uma sequência com início, desenvolvimento e conclusão.</li></ol>',
+ qs:[
+ ['O que os graus romanos permitem?',['Comparar progressões entre tonalidades','Determinar a marca do teclado','Medir o volume'],0,'Graus romanos descrevem relações harmônicas independentes da tonalidade.'],
+ ['Em Dó maior, C–G–Am–F corresponde a:',['I–IV–V–vi','I–V–vi–IV','vi–IV–I–V'],1,'C é I, G é V, Am é vi e F é IV.'],
+ ['Uma função comum da mão esquerda no acompanhamento é:',['Tocar apenas a melodia principal','Sustentar o baixo e a base harmônica','Substituir sempre a mão direita'],1,'A mão esquerda frequentemente sustenta fundamentais ou padrões de baixo.'],
+ ['Qual elemento ajuda a identificar seções de uma música?',['Mudanças de harmonia, dinâmica e textura','Somente a duração total','A marca do instrumento'],0,'Seções podem ser percebidas por mudanças musicais e estruturais.'],
+ ['Qual é uma boa atividade de aplicação integrada?',['Copiar uma música sem entender nada','Criar uma progressão, identificar seus graus e compor uma melodia curta','Tocar aleatoriamente sem ouvir'],1,'A aplicação integrada combina harmonia, escuta e criação.']
+ ]}
+ ];
+ let current=0,answers={};
+ const STORE='pianoAssistant_academy_v1';
+ let saved={};
+ try{saved=JSON.parse(localStorage.getItem(STORE)||'{}')||{}}catch(e){saved={}}
+ const results=()=>saved.results||{};
+ function persist(){saved.results=saved.results||{};try{localStorage.setItem(STORE,JSON.stringify(saved))}catch(e){}}
+ function renderList(){
+  $('academyModuleList').innerHTML=modules.map((m,i)=>{
+   const r=results()[i],done=r&&r.passed;
+   return `<button type="button" class="academy-module ${i===current?'active':''} ${done?'done':''}" data-module="${i}"><b>${String(i+1).padStart(2,'0')} · ${m.title}</b><small>${done?'Concluído · '+r.score+'%':m.level}</small></button>`;
+  }).join('');
+  $('academyModuleList').querySelectorAll('[data-module]').forEach(b=>b.addEventListener('click',()=>{current=Number(b.dataset.module);render()}));
+ }
+ function render(){
+  const m=modules[current],r=results()[current];
+  $('academyModuleKicker').textContent='MÓDULO '+String(current+1).padStart(2,'0');
+  $('academyTitle').textContent=m.title;$('academyGoal').textContent=m.goal;
+  $('academyStatus').textContent=r&&r.passed?'Concluído · '+r.score+'%':r?'Em desenvolvimento':'Não iniciado';
+  $('academyLessons').innerHTML=m.lessons.map(x=>`<div class="academy-lesson"><h4>${x[0]}</h4><p>${x[1]}</p><div class="academy-example">${x[2]}</div></div>`).join('');
+  $('academyPractice').innerHTML=m.practice;
+  $('academyQuiz').innerHTML=m.qs.map((q,i)=>`<div class="academy-question"><b>${i+1}. ${q[0]}</b>${q[1].map((v,j)=>`<label><input type="radio" name="academyQ${i}" value="${j}"> <span>${v}</span></label>`).join('')}</div>`).join('');
+  $('academyFeedback').innerHTML=r?`<div class="academy-result ${r.passed?'good':'bad'}">Último resultado: <b>${r.score}%</b> (${r.correct}/${m.qs.length}). ${r.passed?'Módulo concluído.':'Revise os tópicos indicados e tente novamente.'}</div>`:'';
+  $('academyPrev').disabled=current===0;$('academyNext').disabled=current===modules.length-1;
+  $('academyNext').textContent=current===modules.length-1?'Último módulo':'Próximo módulo';
+  renderList();renderOverall();
+ }
+ function renderOverall(){
+  const rs=results(),done=modules.filter((m,i)=>rs[i]&&rs[i].passed).length;
+  $('academyOverall').textContent=done+'/6 concluídos';$('academyOverallBar').style.width=(done/6*100)+'%';
+  $('profProgress').textContent=done+'/6';
+  const scores=modules.map((m,i)=>rs[i]&&rs[i].passed?rs[i].score:null).filter(v=>v!==null);
+  $('profAccuracy').textContent=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length)+'%':'—';
+  $('profLevel').textContent=done===6?'Trilha concluída':done>=4?'Intermediário em desenvolvimento':done>=2?'Fundamentos em desenvolvimento':'Em avaliação';
+  $('profExercises').textContent=modules.reduce((n,m,i)=>n+(rs[i]?.attempts||0),0);
+  $('profProgressBar').style.width=(done/6*100)+'%';
+  $('profSummary').textContent=done===6?'Você concluiu os seis módulos. Revise os resultados e continue praticando.':`Você concluiu ${done} de 6 módulos. Cada módulo pode ser revisado e reavaliado.`;
+ }
+ $('academyGrade').addEventListener('click',()=>{
+  const m=modules[current];let correct=0,missing=[];
+  m.qs.forEach((q,i)=>{
+   const selected=root.querySelector(`input[name="academyQ${i}"]:checked`);
+   if(!selected){missing.push(i+1);return}
+   if(Number(selected.value)===q[2])correct++;
+  });
+  if(missing.length){$('academyFeedback').innerHTML=`<div class="academy-result bad">Responda todas as questões antes de corrigir. Faltam: ${missing.join(', ')}.</div>`;return}
+  const score=Math.round(correct/m.qs.length*100),passed=score>=80;
+  const old=results()[current]||{attempts:0};
+  saved.results=saved.results||{};saved.results[current]={score,correct,passed,attempts:(old.attempts||0)+1,lastAt:new Date().toISOString()};persist();
+  const explanations=m.qs.map((q,i)=>{const v=Number(root.querySelector(`input[name="academyQ${i}"]:checked`).value);return `<p><b>${i+1}. ${v===q[2]?'Correto.':'Reveja.'}</b> ${q[3]}</p>`}).join('');
+  $('academyFeedback').innerHTML=`<div class="academy-result ${passed?'good':'bad'}"><h4>Resultado: ${score}%</h4><p>${correct} de ${m.qs.length} respostas corretas. ${passed?'Módulo concluído!':'Meta para concluir: 80%. Revise a aula e tente novamente.'}</p>${explanations}</div>`;
+  $('academyStatus').textContent=passed?'Concluído · '+score+'%':'Em desenvolvimento';renderList();renderOverall();
+ });
+ $('academyPrev').addEventListener('click',()=>{if(current>0){current--;render();}});
+ $('academyNext').addEventListener('click',()=>{if(current<modules.length-1){current++;render();}});
+ render();
+})();
+
 // Professor de Teclado: captura e análise polifônica em pipeline próprio.
 // Não reutiliza nem modifica micStream, micAnalyser, micRAF ou o gravador existentes.
 (()=>{
@@ -444,42 +611,6 @@ $('#recordPlay').onclick=()=>{if(recordBlob){let u=URL.createObjectURL(recordBlo
  window.addEventListener('pagehide',stop);
  showChallenge();
 })();
-
-// Trilha modular do Professor — estado e interface independentes dos recursos de áudio.
-(()=>{
- const $=id=>document.getElementById(id);
- const modules=[
-  {title:'Notas musicais',level:'Fundamentos',desc:'Localização das notas, acidentes e oitavas.',lesson:'<h4>1. As sete notas naturais</h4><p>A sequência é Dó, Ré, Mi, Fá, Sol, Lá e Si. Depois de Si, a sequência recomeça em Dó, uma oitava acima.</p><h4>2. Semitons e tons</h4><p>No teclado, semitom é a menor distância usual entre duas teclas vizinhas. Um tom equivale a dois semitons. Entre Mi–Fá e Si–Dó há semitom natural.</p><h4>3. Acidentes</h4><p>Sustenido (#) eleva a nota em um semitom; bemol (♭) abaixa em um semitom. Dó♯ e Ré♭ podem soar iguais no teclado temperado, embora tenham nomes e funções diferentes.</p>',practice:'Encontre todos os Dós do teclado. Depois toque a sequência Dó–Ré–Mi–Fá–Sol–Lá–Si–Dó, dizendo os nomes em voz alta.',questions:[['Qual nota vem imediatamente depois de Mi na sequência natural?',['Fá','Sol','Ré'],0,'A sequência natural é Dó, Ré, Mi, Fá, Sol, Lá e Si.'],['Quantos semitons formam um tom?',['1','2','3'],1,'Um tom corresponde a dois semitons.'],['O que o sustenido faz com a altura da nota?',['Abaixa um semitom','Eleva um semitom','Eleva um tom'],1,'O sustenido eleva a nota em um semitom.']]},
-  {title:'Intervalos e acordes',level:'Harmonia básica',desc:'Distâncias entre notas, tríades e inversões.',lesson:'<h4>1. Intervalos</h4><p>Intervalo é a distância entre duas notas. A contagem dos nomes define o número (segunda, terça, quarta etc.); a quantidade de semitons ajuda a identificar sua qualidade.</p><h4>2. Tríades</h4><p>Uma tríade é formada por fundamental, terça e quinta. A tríade maior tem terça maior e quinta justa; a menor tem terça menor e quinta justa.</p><h4>3. Inversões</h4><p>Na posição fundamental, a fundamental está no baixo. Na primeira inversão, a terça está no baixo; na segunda, a quinta está no baixo. As notas do acorde continuam as mesmas, mas a ordem muda.</p>',practice:'Monte Dó maior (Dó–Mi–Sol). Toque primeiro com Dó no baixo, depois Mi no baixo e por fim Sol no baixo. Identifique a inversão pelo som e pela nota mais grave.',questions:[['Quais são os três componentes básicos de uma tríade?',['Fundamental, terça e quinta','Fundamental, quarta e sexta','Tônica, sétima e nona'],0,'A tríade básica reúne fundamental, terça e quinta.'],['Qual nota fica no baixo da primeira inversão de uma tríade?',['Fundamental','Terça','Quinta'],1,'Na primeira inversão, a terça é a nota mais grave.'],['Qual intervalo diferencia a tríade maior da menor?',['A terça','A quinta','A oitava'],0,'A terça é maior na tríade maior e menor na tríade menor.']]},
-  {title:'Escalas e tonalidades',level:'Teoria aplicada',desc:'Escalas maiores e menores, graus e tonalidade.',lesson:'<h4>1. Escala maior</h4><p>A escala maior segue o padrão de intervalos: tom, tom, semitom, tom, tom, tom, semitom.</p><h4>2. Graus</h4><p>Cada nota da escala recebe um grau em algarismo romano: I, II, III, IV, V, VI e VII. O primeiro grau é a tônica.</p><h4>3. Tonalidade</h4><p>A tonalidade organiza a música em torno de uma nota e de um centro harmônico. A armadura de clave indica os sustenidos ou bemóis característicos da tonalidade.</p>',practice:'Toque Dó maior subindo e descendo. Em seguida, numere as notas de I a VII e localize os semitons entre III–IV e VII–I.',questions:[['Qual é o padrão de intervalos da escala maior?',['T–T–ST–T–T–T–ST','T–ST–T–T–ST–T–T','ST–T–T–ST–T–T–T'],0,'A escala maior segue tom, tom, semitom, tom, tom, tom, semitom.'],['Como é chamado o primeiro grau da escala?',['Dominante','Tônica','Sensível'],1,'O primeiro grau é a tônica, centro de referência da tonalidade.'],['Em Dó maior, qual nota corresponde ao grau V?',['Fá','Sol','Lá'],1,'Os graus de Dó maior são Dó(I), Ré(II), Mi(III), Fá(IV), Sol(V), Lá(VI), Si(VII).']]},
-  {title:'Harmonia',level:'Construção musical',desc:'Campo harmônico, funções e cadências.',lesson:'<h4>1. Campo harmônico</h4><p>É o conjunto de acordes construídos sobre os graus de uma escala. Em uma tonalidade maior, a sequência básica de qualidades é: maior, menor, menor, maior, maior, menor e diminuto.</p><h4>2. Funções harmônicas</h4><p>Tônica transmite repouso; subdominante prepara o movimento; dominante cria tensão e tende a resolver na tônica.</p><h4>3. Cadências</h4><p>A cadência autêntica V–I é uma resolução forte da dominante para a tônica. A progressão I–V–vi–IV é comum na música popular, mas seu efeito depende do contexto.</p>',practice:'Em Dó maior, toque C–F–G–C. Identifique a função de cada acorde: repouso, preparação ou tensão/resolução.',questions:[['Qual função harmônica costuma transmitir repouso?',['Tônica','Dominante','Subdominante'],0,'A tônica é o principal ponto de repouso harmônico.'],['Em Dó maior, qual acorde é o V grau?',['Fá maior','Sol maior','Lá menor'],1,'O quinto grau de Dó maior é Sol; seu acorde é Sol maior.'],['Qual progressão representa uma cadência autêntica básica?',['IV–V','V–I','I–IV'],1,'A resolução V–I conduz da dominante à tônica.']]},
-  {title:'Execução prática',level:'Técnica',desc:'Ritmo, coordenação, postura e consistência.',lesson:'<h4>1. Ritmo e pulso</h4><p>Pulso é a marcação regular da música. Andamento indica a velocidade do pulso, frequentemente medida em BPM.</p><h4>2. Coordenação</h4><p>Comece cada mão separadamente, em andamento confortável. Depois una as mãos em trechos curtos e aumente a velocidade somente quando houver controle.</p><h4>3. Qualidade de execução</h4><p>Observe regularidade, precisão, continuidade e relaxamento. Uma execução lenta e controlada é mais útil para aprender do que acelerar com erros recorrentes.</p>',practice:'Configure o metrônomo em 60 BPM. Toque uma escala com a mão direita em quatro tempos por nota; depois faça fundamentais com a esquerda. Una as mãos lentamente.',questions:[['O que significa BPM?',['Batidas por minuto','Baixos por melodia','Blocos por medida'],0,'BPM significa beats per minute, ou batidas por minuto.'],['Qual é a melhor estratégia ao unir as mãos?',['Começar na velocidade máxima','Praticar trechos curtos e lentos','Ignorar erros de ritmo'],1,'Trechos curtos e lentos ajudam a consolidar coordenação e precisão.'],['O que deve acontecer antes de aumentar o andamento?',['A execução deve estar controlada','Aumentar mesmo com erros','Tocar mais forte'],0,'Aumente a velocidade quando conseguir executar com controle e regularidade.']]},
-  {title:'Aplicação musical',level:'Integração',desc:'Aplicar teoria em progressões, acompanhamento e repertório.',lesson:'<h4>1. Da teoria à música</h4><p>Conhecer os acordes permite reconhecer padrões, acompanhar melodias e transportar progressões para outras tonalidades.</p><h4>2. Acompanhamento</h4><p>Uma forma inicial é tocar a fundamental ou o acorde na mão esquerda e uma melodia simples na direita. O ritmo e a dinâmica devem respeitar o caráter da música.</p><h4>3. Análise consciente</h4><p>Ao estudar uma música, procure identificar tonalidade, acordes, graus, padrão rítmico, notas da melodia e pontos de mudança harmônica. Confirme as hipóteses ouvindo e tocando.</p>',practice:'Escolha uma música que você já conhece. Tente identificar o pulso, cantar a melodia, localizar o acorde de repouso e montar um acompanhamento simples. Registre suas hipóteses para conferir depois.',questions:[['Qual é um bom primeiro passo para analisar uma música?',['Identificar o pulso e ouvir a estrutura','Tocar o mais rápido possível','Escolher acordes aleatórios'],0,'Ouvir o pulso e a estrutura dá uma base para analisar melodia e harmonia.'],['Ao transportar uma progressão, o que deve ser preservado?',['Apenas as notas absolutas','As relações entre os graus','Somente o ritmo'],1,'A transposição preserva as relações intervalares e funções, mudando a tonalidade.'],['Uma análise musical confiável deve ser…',['Uma hipótese conferida com a escuta e a execução','Baseada apenas no título','Sempre igual para todas as músicas'],0,'A análise deve ser verificada com evidências musicais, não apenas por suposição.']]}
- ];
- const storageKey='pianoAssistant.profModules.v1';let state={};
- try{state=JSON.parse(localStorage.getItem(storageKey)||'{}')||{}}catch(e){state={}}
- let active=-1,qIndex=0,answers=[],checked=false;
- const save=()=>{try{localStorage.setItem(storageKey,JSON.stringify(state))}catch(e){}};
- const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- function renderGrid(){
-  $('profModuleGrid').innerHTML=modules.map((m,i)=>{const r=state[i],done=!!(r&&r.completed),score=done?r.score:0;return `<article class="prof-module-card"><span class="prof-number">MÓDULO ${String(i+1).padStart(2,'0')}</span><h4>${esc(m.title)}</h4><p>${esc(m.desc)}</p><div class="prof-module-meta"><span>${esc(m.level)}</span><b>${done?score+'%':'Não iniciado'}</b></div><div class="prof-small-track"><span style="width:${done?score:0}%"></span></div><button class="btn ${done?'':'primary'}" data-open-module="${i}" type="button">${done?'Revisar módulo':'Estudar módulo'}</button></article>`}).join('');
-  $('profModuleGrid').querySelectorAll('[data-open-module]').forEach(b=>b.addEventListener('click',()=>openModule(Number(b.dataset.openModule))));
-  const completed=modules.filter((_,i)=>state[i]?.completed).length;
-  $('profProgress').textContent=completed+'/6';$('profProgressBar').style.width=(completed/6*100)+'%';
-  $('profAccuracy').textContent=completed?Math.round(modules.reduce((a,_,i)=>a+(state[i]?.completed?state[i].score:0),0)/completed)+'%':'—';
-  $('profExercises').textContent=modules.reduce((a,_,i)=>a+(state[i]?.attempts||0),0);
-  $('profLevel').textContent=completed===6?'Trilha concluída':completed===0?'A iniciar':completed<=2?'Fundamentos':completed<=4?'Intermediário':'Avançando';
-  $('profSummary').textContent=completed===6?'Você concluiu os seis módulos. Revise os temas com menor pontuação para consolidar o aprendizado.':`${completed} de 6 módulos concluídos. Escolha um módulo para começar ou continuar sua evolução.`;
- }
- function openModule(i){active=i;qIndex=0;answers=[];checked=false;$('profModuleGrid').hidden=true;$('profModuleWorkspace').hidden=false;$('profModuleKicker').textContent='MÓDULO '+String(i+1).padStart(2,'0')+' · '+modules[i].level;$('profModuleTitle').textContent=modules[i].title;$('profModuleLesson').innerHTML=modules[i].lesson;$('profModulePractice').textContent=modules[i].practice;$('profRetakeModule').hidden=true;renderQuestion();$('profModuleWorkspace').scrollIntoView({behavior:'smooth',block:'start'});}
- function renderQuestion(){const q=modules[active].questions[qIndex];$('profQuizCount').textContent=`Questão ${qIndex+1} de ${modules[active].questions.length}`;$('profQuizScore').textContent='Em andamento';$('profQuizArea').innerHTML=`<div class="prof-question">${esc(q[0])}</div>`+q[1].map((v,i)=>`<label class="prof-option"><input type="radio" name="profModuleAnswer" value="${i}" ${answers[qIndex]===i?'checked':''}> <span>${esc(v)}</span></label>`).join('');$('profCheckAnswer').disabled=false;$('profNextQuestion').disabled=true;$('profQuizFeedback').className='prof-feedback';$('profQuizFeedback').textContent='Selecione uma alternativa e confira sua resposta.';checked=false;}
- $('profCheckAnswer').addEventListener('click',()=>{if(checked)return;const selected=document.querySelector('input[name="profModuleAnswer"]:checked');if(!selected){$('profQuizFeedback').className='prof-feedback bad';$('profQuizFeedback').textContent='Selecione uma alternativa antes de conferir.';return;}const q=modules[active].questions[qIndex],v=Number(selected.value);answers[qIndex]=v;checked=true;const correct=v===q[2];$('profQuizFeedback').className='prof-feedback '+(correct?'good':'bad');$('profQuizFeedback').innerHTML=`<b>${correct?'Resposta correta.':'Vamos revisar.'}</b> ${esc(q[3])}`;$('profCheckAnswer').disabled=true;$('profNextQuestion').disabled=false;$('profQuizScore').textContent=`${answers.filter((a,j)=>a===modules[active].questions[j][2]).length} acerto(s) até agora`;});
- $('profNextQuestion').addEventListener('click',()=>{if(!checked)return;if(qIndex<modules[active].questions.length-1){qIndex++;renderQuestion();}else{const total=modules[active].questions.length,score=Math.round(answers.filter((a,j)=>a===modules[active].questions[j][2]).length/total*100);state[active]={completed:true,score,attempts:(state[active]?.attempts||0)+1,finishedAt:new Date().toISOString()};save();$('profQuizArea').innerHTML=`<div class="prof-module-card"><h4>Avaliação concluída</h4><div class="prof-detected">${score}%</div><p>${score===100?'Excelente domínio neste conjunto de questões.':score>=67?'Boa base. Revise os pontos em que errou.':'Releia a aula e repita a atividade prática antes de tentar novamente.'}</p></div>`;$('profQuizCount').textContent='Resultado final';$('profQuizScore').textContent=score+'%';$('profCheckAnswer').disabled=true;$('profNextQuestion').disabled=true;$('profQuizFeedback').textContent='Seu resultado foi salvo neste aparelho. Você pode revisar o módulo ou refazer a avaliação.';$('profRetakeModule').hidden=false;renderGrid();}});
- $('profRetakeModule').addEventListener('click',()=>openModule(active));
- $('profBackModules').addEventListener('click',()=>{$('profModuleWorkspace').hidden=true;$('profModuleGrid').hidden=false;renderGrid();});
- renderGrid();
-})();
-
 if('serviceWorker'in navigator&&location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 </script>
 </body></html>
