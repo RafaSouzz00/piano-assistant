@@ -104,11 +104,11 @@ textarea{min-height:75px;resize:vertical}.row{display:flex;gap:9px;align-items:c
   <p>Toque o acorde solicitado no seu teclado. O analisador identifica várias notas simultâneas e compara as classes de notas encontradas com o acorde esperado.</p>
   <div class="prof-audio-panel">
    <div class="row">
-    <div><small class="muted">DESAFIO ATUAL</small><div id="profChordName" class="prof-detected">Dó maior</div><small id="profChordNotes" class="muted">Notas esperadas: C · E · G</small></div>
+    <div><small class="muted">DESAFIO ATUAL</small><div id="profChordName" class="prof-detected">Dó maior</div><small id="profChordNotes" class="muted">Notas esperadas: C · E · G</small><div id="profInversionTarget" style="margin-top:6px;color:var(--cyan);font-weight:700">Posição fundamental · baixo: C</div></div>
     <button class="btn" id="profNextChord" type="button">Próximo desafio</button>
    </div>
    <div style="margin-top:12px"><small class="muted">SINAL DO MICROFONE</small><div class="prof-meter"><span id="profSignal"></span></div><div id="profPolyStatus" class="muted" role="status">Microfone do professor desligado.</div></div>
-   <div style="margin-top:12px"><small class="muted">NOTAS DETECTADAS</small><div id="profDetectedNotes" class="prof-detected">—</div><small id="profConfidence" class="muted">Aguardando execução.</small></div>
+   <div style="margin-top:12px"><small class="muted">NOTAS DETECTADAS</small><div id="profDetectedNotes" class="prof-detected">—</div><small id="profConfidence" class="muted">Aguardando execução.</small><div id="profBassDetected" class="muted" style="margin-top:5px">Nota mais grave detectada: —</div></div>
    <div class="prof-audio-actions" style="margin-top:12px">
     <button class="btn primary" id="profListen" type="button">Iniciar escuta</button>
     <button class="btn" id="profEvaluate" type="button" disabled>Avaliar execução</button>
@@ -282,7 +282,7 @@ $('#recordPlay').onclick=()=>{if(recordBlob){let u=URL.createObjectURL(recordBlo
 // Não reutiliza nem modifica micStream, micAnalyser, micRAF ou o gravador existentes.
 (()=>{
  const $p=id=>document.getElementById(id);
- const challenges=[
+ const chords=[
   {name:'Dó maior',notes:[0,4,7],labels:['C','E','G']},
   {name:'Sol maior',notes:[7,11,2],labels:['G','B','D']},
   {name:'Lá menor',notes:[9,0,4],labels:['A','C','E']},
@@ -290,17 +290,24 @@ $('#recordPlay').onclick=()=>{if(recordBlob){let u=URL.createObjectURL(recordBlo
   {name:'Ré menor',notes:[2,5,9],labels:['D','F','A']},
   {name:'Mi menor',notes:[4,7,11],labels:['E','G','B']}
  ];
+ const inversions=[
+  {name:'Posição fundamental',index:0},
+  {name:'1ª inversão',index:1},
+  {name:'2ª inversão',index:2}
+ ];
  const noteNames=['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'];
  let challengeIndex=0,stream=null,ctx=null,source=null,analyser=null,raf=null,latest=[],latestStrength=0,frames=0;
- const challenge=()=>challenges[challengeIndex];
+ const challenge=()=>{const chord=chords[Math.floor(challengeIndex/inversions.length)],inversion=inversions[challengeIndex%inversions.length];return {...chord,inversion};};
  function showChallenge(){
   const c=challenge();
   $p('profChordName').textContent=c.name;
-  $p('profChordNotes').textContent='Notas esperadas: '+c.labels.join(' · ');
+  $p('profChordNotes').textContent='Notas do acorde: '+c.labels.join(' · ');
+  $p('profInversionTarget').textContent=c.inversion.name+' · baixo esperado: '+c.labels[c.inversion.index];
   $p('profDetectedNotes').textContent='—';
   $p('profConfidence').textContent='Aguardando execução.';
+  $p('profBassDetected').textContent='Nota mais grave detectada: —';
   $p('profCorrection').className='prof-feedback';
-  $p('profCorrection').textContent='Toque o acorde inteiro, mantenha as teclas pressionadas por um instante e avalie.';
+  $p('profCorrection').textContent='Toque as três notas simultaneamente, organizando o acorde na inversão solicitada. Mantenha as teclas pressionadas por um instante e avalie.';
  }
  function stop(){
   if(raf!==null)cancelAnimationFrame(raf);raf=null;
@@ -330,7 +337,6 @@ $('#recordPlay').onclick=()=>{if(recordBlob){let u=URL.createObjectURL(recordBlo
   peaks.sort((a,b)=>b.level-a.level);
   const fundamentals=[];
   for(const peak of peaks){
-   // Descarta picos que sejam harmônicos inteiros de uma fundamental mais forte.
    const harmonic=fundamentals.some(f=>{
     const ratio=peak.freq/f.freq,nearest=Math.round(ratio);
     return nearest>=2&&nearest<=6&&Math.abs(ratio-nearest)<.035;
@@ -338,7 +344,7 @@ $('#recordPlay').onclick=()=>{if(recordBlob){let u=URL.createObjectURL(recordBlo
    if(!harmonic)fundamentals.push(peak);
    if(fundamentals.length>=12)break;
   }
-  if(!fundamentals.length){latest=[];latestStrength=0;$p('profDetectedNotes').textContent='Nenhuma nota identificada';$p('profConfidence').textContent='Toque notas simultâneas com mais clareza.';return}
+  if(!fundamentals.length){latest=[];latestStrength=0;$p('profDetectedNotes').textContent='Nenhuma nota identificada';$p('profConfidence').textContent='Toque notas simultâneas com mais clareza.';$p('profBassDetected').textContent='Nota mais grave detectada: —';return}
   const top=fundamentals[0].level;
   const chosen=fundamentals.filter(f=>f.level>=top-22).slice(0,6);
   const unique=[];
@@ -353,11 +359,12 @@ $('#recordPlay').onclick=()=>{if(recordBlob){let u=URL.createObjectURL(recordBlo
   $p('profSignal').style.width=latestStrength+'%';
   $p('profDetectedNotes').textContent=unique.length?unique.map(n=>noteNames[n.pc]).join(' · '):'—';
   $p('profConfidence').textContent=unique.length+' classe(s) de nota detectada(s) · leitura espectral experimental';
+  $p('profBassDetected').textContent=unique.length?'Nota mais grave detectada: '+noteNames[unique[0].pc]+' (MIDI '+unique[0].midi+')':'Nota mais grave detectada: —';
  }
  function loop(){
   if(!analyser)return;
   analyzeSpectrum();frames++;
-  if(frames%4===0)$p('profPolyStatus').textContent='Escutando seu teclado… mantenha o acorde pressionado.';
+  if(frames%4===0)$p('profPolyStatus').textContent='Escutando seu teclado… mantenha a inversão pressionada.';
   raf=requestAnimationFrame(loop);
  }
  $p('profListen').addEventListener('click',async()=>{
@@ -375,8 +382,8 @@ $('#recordPlay').onclick=()=>{if(recordBlob){let u=URL.createObjectURL(recordBlo
    analyser=ctx.createAnalyser();analyser.fftSize=16384;analyser.smoothingTimeConstant=.18;analyser.minDecibels=-100;analyser.maxDecibels=-20;
    source.connect(analyser);
    $p('profListen').disabled=true;$p('profEvaluate').disabled=false;$p('profStop').disabled=false;
-   $p('profPolyStatus').textContent='Microfone ativo. Toque o acorde solicitado.';
-   $p('profCorrection').textContent='Ouvindo… toque todas as notas do acorde ao mesmo tempo.';
+   $p('profPolyStatus').textContent='Microfone ativo. Toque a inversão solicitada.';
+   $p('profCorrection').textContent='Ouvindo… toque as três notas do acorde simultaneamente.';
    loop();
   }catch(e){
    stop();
@@ -391,26 +398,27 @@ $('#recordPlay').onclick=()=>{if(recordBlob){let u=URL.createObjectURL(recordBlo
    $p('profCorrection').textContent='Ainda não consegui identificar notas suficientes. Toque o acorde completo, mantenha as teclas pressionadas e tente novamente.';
    return;
   }
-  const correct=expected.filter(n=>found.includes(n)),missing=expected.filter(n=>!found.includes(n)),extra=found.filter(n=>!expected.includes(n));
-  const percent=Math.round(correct.length/expected.length*100);
-  const exact=missing.length===0&&extra.length===0;
-  $p('profCorrection').className='prof-feedback '+(exact?'good':'bad');
-  if(exact){
-   $p('profCorrection').innerHTML='<b>Correto! Você executou '+challenge().name+'.</b><br>O detector identificou as três classes de notas esperadas: '+challenge().labels.join(' · ')+'.';
+  const c=challenge(),correct=expected.filter(n=>found.includes(n)),missing=expected.filter(n=>!found.includes(n)),extra=found.filter(n=>!expected.includes(n));
+  const percent=Math.round(correct.length/expected.length*100),exact=missing.length===0&&extra.length===0;
+  const bass=latest.length?latest[0].pc:null,expectedBass=c.notes[c.inversion.index];
+  const bassCorrect=bass===expectedBass;
+  $p('profCorrection').className='prof-feedback '+(exact&&bassCorrect?'good':'bad');
+  if(exact&&bassCorrect){
+   $p('profCorrection').innerHTML='<b>Correto! Você executou '+c.name+' na '+c.inversion.name.toLowerCase()+'.</b><br>Notas identificadas: '+c.labels.join(' · ')+'.<br>O baixo foi '+noteNames[bass]+', que corresponde à '+(c.inversion.index===0?'fundamental':c.inversion.index===1?'terça':'quinta')+' do acorde.';
   }else{
-   let msg='<b>Vamos corrigir juntos.</b><br>Notas identificadas: '+found.map(n=>noteNames[n]).join(' · ')+'.';
-   if(missing.length)msg+='<br>Não consegui confirmar: '+missing.map(n=>noteNames[n]).join(' · ')+'.';
+   let msg='<b>'+ (exact?'As notas do acorde estão corretas, mas a inversão precisa de ajuste.':'Vamos corrigir juntos.')+'</b><br>Notas identificadas: '+found.map(n=>noteNames[n]).join(' · ')+'.';
+   if(missing.length)msg+='<br>Notas esperadas não confirmadas: '+missing.map(n=>noteNames[n]).join(' · ')+'.';
    if(extra.length)msg+='<br>Notas adicionais detectadas: '+extra.map(n=>noteNames[n]).join(' · ')+'.';
-   msg+='<br>Correspondência parcial: '+percent+'%. Confira as teclas e tente novamente.';
+   if(bass!==null)msg+='<br>Baixo detectado: '+noteNames[bass]+'. Baixo esperado: '+noteNames[expectedBass]+' ('+(c.inversion.index===0?'fundamental':c.inversion.index===1?'terça':'quinta')+').';
+   msg+='<br>Correspondência das notas: '+percent+'%. Confira a nota mais grave e tente novamente.';
    $p('profCorrection').innerHTML=msg;
   }
  });
- $p('profNextChord').addEventListener('click',()=>{challengeIndex=(challengeIndex+1)%challenges.length;showChallenge()});
+ $p('profNextChord').addEventListener('click',()=>{challengeIndex=(challengeIndex+1)%(chords.length*inversions.length);showChallenge()});
  $p('profStop').addEventListener('click',stop);
  window.addEventListener('pagehide',stop);
  showChallenge();
 })();
-
 if('serviceWorker'in navigator&&location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 </script>
 </body></html>
