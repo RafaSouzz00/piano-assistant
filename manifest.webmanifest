@@ -1,0 +1,11 @@
+{
+  "name": "Piano Assistant",
+  "short_name": "Piano Assistant",
+  "description": "Seu espaço pessoal de estudos musicais.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#071225",
+  "theme_color": "#081326",
+  "icons": []
+}
