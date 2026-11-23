@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#081326">
+  <meta name="description" content="Piano Assistant — seu espaço pessoal de estudos musicais.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <title>Piano Assistant</title>
+  <style>
+    :root{--bg:#071225;--panel:#101f38;--panel2:#142744;--blue:#4da3ff;--cyan:#78d8ff;--text:#eef5ff;--muted:#9fb1c9;--line:#263c5b}
+    *{box-sizing:border-box} body{margin:0;background:linear-gradient(160deg,#081326,#0c1b32 60%,#071225);color:var(--text);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    header{padding:28px 20px 20px;background:radial-gradient(ellipse at 80% 0%,#173c68 0,transparent 55%)}
+    .eyebrow{color:var(--cyan);font-size:12px;letter-spacing:2px;text-transform:uppercase}
+    h1{margin:8px 0;font-size:29px} p{line-height:1.5;color:var(--muted)}
+    nav{display:flex;gap:8px;overflow:auto;padding:0 16px 14px;position:sticky;top:0;background:#081326ed;backdrop-filter:blur(12px);z-index:5}
+    nav button,.action{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:12px;padding:11px 14px;font-weight:600;white-space:nowrap}
+    nav button.active,.action.primary{background:#174c83;border-color:#347fc4}
+    main{padding:4px 16px 100px;max-width:850px;margin:auto}.tab{display:none}.tab.active{display:block}
+    .card{background:linear-gradient(145deg,#11233e,#0e1c32);border:1px solid var(--line);border-radius:18px;padding:17px;margin:12px 0;box-shadow:0 10px 30px #0002}
+    h2{font-size:20px;margin:4px 0 12px} h3{margin:0 0 8px;font-size:16px}
+    .muted{color:var(--muted);font-size:14px}.statrow{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .stat{background:#0b1930;border:1px solid var(--line);border-radius:14px;padding:14px}.stat strong{display:block;font-size:23px;color:var(--cyan)}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    input,select,textarea{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:#08172c;color:var(--text);margin:5px 0 12px;font:inherit}
+    label{font-size:13px;color:var(--muted)} .keys{display:flex;gap:3px;height:145px;margin:16px 0;position:relative}
+    .key{flex:1;background:#f4f7fc;border:1px solid #9aa8b8;border-radius:0 0 7px 7px;color:#18243a;display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;font-size:11px;min-width:0}
+    .key.black{background:#14243d;color:white;height:88px;flex:.62;margin:0 -13px;z-index:2;border:1px solid #52627a;border-radius:0 0 5px 5px}
+    .key:active{background:#9bd4ff}
+    .toolrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.toolrow input{width:auto;max-width:100px}
+    .item{padding:11px 0;border-bottom:1px solid var(--line)}.item:last-child{border:0}
+    footer{text-align:center;color:var(--muted);font-size:12px;padding:24px}
+    @media(min-width:650px){.statrow{grid-template-columns:repeat(4,1fr)}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Seu laboratório musical</div>
+  <h1>Piano Assistant</h1>
+  <p>Aprenda teoria, pratique no teclado e acompanhe sua evolução.</p>
+</header>
+<nav aria-label="Navegação principal">
+  <button class="active" data-tab="inicio">Início</button>
+  <button data-tab="teoria">Teoria</button>
+  <button data-tab="repertorio">Repertório</button>
+  <button data-tab="progresso">Progresso</button>
+  <button data-tab="ferramentas">Ferramentas</button>
+</nav>
+<main>
+<section id="inicio" class="tab active">
+  <div class="card">
+    <div class="eyebrow">Painel de estudo</div><h2>Bem-vindo ao seu espaço musical.</h2>
+    <p>Comece com uma pequena sessão: revise um conceito, pratique algumas notas e registre o que estudou.</p>
+    <button class="action primary" onclick="showTab('teoria')">Começar a estudar</button>
+  </div>
+  <div class="statrow">
+    <div class="stat"><strong id="sessions">0</strong><span class="muted">Sessões</span></div>
+    <div class="stat"><strong id="minutes">0</strong><span class="muted">Minutos</span></div>
+    <div class="stat"><strong id="songs">0</strong><span class="muted">Músicas</span></div>
+    <div class="stat"><strong id="days">0</strong><span class="muted">Dias de estudo</span></div>
+  </div>
+  <div class="card"><h3>Atividade sugerida</h3><p>Toque a escala de Dó maior lentamente: Dó, Ré, Mi, Fá, Sol, Lá, Si, Dó. Depois faça o caminho de volta.</p></div>
+</section>
+<section id="teoria" class="tab">
+  <div class="card"><h2>Campo harmônico de Dó maior</h2>
+    <div class="item">I — C (Dó maior): Dó · Mi · Sol</div><div class="item">ii — Dm (Ré menor): Ré · Fá · Lá</div>
+    <div class="item">iii — Em (Mi menor): Mi · Sol · Si</div><div class="item">IV — F (Fá maior): Fá · Lá · Dó</div>
+    <div class="item">V — G (Sol maior): Sol · Si · Ré</div><div class="item">vi — Am (Lá menor): Lá · Dó · Mi</div>
+    <div class="item">vii° — Bdim (Si diminuto): Si · Ré · Fá</div>
+  </div>
+  <div class="card"><h2>Dicionário básico de acordes</h2>
+    <label for="chord">Escolha um acorde</label><select id="chord"><option value="C">C — Dó maior</option><option value="Cm">Cm — Dó menor</option><option value="C7">C7 — Dó com sétima</option><option value="Cmaj7">Cmaj7 — Dó com sétima maior</option><option value="Cm7">Cm7 — Dó menor com sétima</option><option value="Cadd9">Cadd9 — Dó com nona adicionada</option><option value="Csus4">Csus4 — Dó suspenso</option></select>
+    <p id="chordNotes">Notas: Dó · Mi · Sol</p>
+  </div>
+</section>
+<section id="repertorio" class="tab">
+  <div class="card"><h2>Minha biblioteca</h2><p>Cadastre músicas que você está estudando. Insira letras somente quando tiver autorização ou quando forem de domínio público.</p>
+    <label for="songName">Nome da música</label><input id="songName" placeholder="Ex.: Minha música de estudo">
+    <label for="songKey">Tom</label><input id="songKey" placeholder="Ex.: G">
+    <button class="action primary" id="addSong">Adicionar música</button><div id="songList"></div>
+  </div>
+</section>
+<section id="progresso" class="tab">
+  <div class="card"><h2>Registrar sessão</h2>
+    <label for="studyMinutes">Minutos estudados</label><input id="studyMinutes" type="number" min="1" max="600" value="20">
+    <label for="studyTopic">O que você estudou?</label><input id="studyTopic" placeholder="Ex.: escala de Dó maior">
+    <button class="action primary" id="saveSession">Salvar sessão</button>
+  </div>
+  <div class="card"><h2>Diário musical</h2><div id="history" class="muted">Nenhuma sessão registrada ainda.</div></div>
+</section>
+<section id="ferramentas" class="tab">
+  <div class="card"><h2>Teclado virtual</h2><p>Toque nas teclas para ouvir as notas. Este teclado é uma referência de uma oitava.</p><div class="keys" id="keyboard"></div><p class="muted" id="lastNote">Selecione uma tecla.</p></div>
+  <div class="card"><h2>Metrônomo</h2><div class="toolrow"><label for="bpm">BPM</label><input id="bpm" type="number" min="30" max="240" value="80"><button class="action primary" id="metro">Iniciar</button><strong id="beat">●</strong></div><p class="muted">Mantenha o volume do iPhone em um nível confortável.</p></div>
+  <div class="card"><h2>Transpositor simples</h2><label for="semitones">Semitons</label><input id="semitones" type="number" min="-11" max="11" value="0"><p id="transposeResult">C → C</p><button class="action" id="transpose">Calcular transposição de C</button></div>
+</section>
+</main>
+<footer>PIANO ASSISTANT · VERSÃO INICIAL · Seus registros ficam neste navegador.</footer>
+<script>
+const $=s=>document.querySelector(s);
+function showTab(id){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));window.scrollTo(0,0)}
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+const chordMap={C:'Dó · Mi · Sol',Cm:'Dó · Mi♭ · Sol',C7:'Dó · Mi · Sol · Si♭',Cmaj7:'Dó · Mi · Sol · Si',Cm7:'Dó · Mi♭ · Sol · Si♭',Cadd9:'Dó · Mi · Sol · Ré',Csus4:'Dó · Fá · Sol'};
+$('#chord').addEventListener('change',e=>$('#chordNotes').textContent='Notas: '+chordMap[e.target.value]);
+let data={sessions:[],songs:[]};try{data=JSON.parse(localStorage.getItem('pa-data'))||data}catch(e){}
+function save(){localStorage.setItem('pa-data',JSON.stringify(data));render()}
+function render(){
+ $('#sessions').textContent=data.sessions.length;
+ $('#minutes').textContent=data.sessions.reduce((a,x)=>a+x.minutes,0);
+ $('#songs').textContent=data.songs.length;
+ $('#days').textContent=new Set(data.sessions.map(x=>x.date)).size;
+ $('#songList').innerHTML=data.songs.map(s=>`<div class="item">${escapeHTML(s.name)} <span class="muted">· ${escapeHTML(s.key||'Tom não informado')}</span></div>`).join('');
+ $('#history').innerHTML=data.sessions.length?data.sessions.slice().reverse().map(s=>`<div class="item"><strong>${s.minutes} min</strong> · ${escapeHTML(s.topic)}<br><span class="muted">${s.date}</span></div>`).join(''):'Nenhuma sessão registrada ainda.';
+}
+function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+$('#addSong').onclick=()=>{let name=$('#songName').value.trim();if(!name)return;data.songs.push({name,key:$('#songKey').value.trim()});$('#songName').value='';$('#songKey').value='';save()};
+$('#saveSession').onclick=()=>{let minutes=Math.max(1,Math.min(600,Number($('#studyMinutes').value)||20));data.sessions.push({minutes,topic:$('#studyTopic').value.trim()||'Estudo livre',date:new Date().toLocaleDateString('pt-BR')});$('#studyTopic').value='';save()};
+render();
+const audio=new (window.AudioContext||window.webkitAudioContext)();
+const notes=[['Dó','C4',261.63],['Dó♯','C#4',277.18],['Ré','D4',293.66],['Ré♯','D#4',311.13],['Mi','E4',329.63],['Fá','F4',349.23],['Fá♯','F#4',369.99],['Sol','G4',392],['Sol♯','G#4',415.3],['Lá','A4',440],['Lá♯','A#4',466.16],['Si','B4',493.88],['Dó','C5',523.25]];
+notes.forEach((n,i)=>{let b=document.createElement('button');b.className='key'+([1,3,6,8,10].includes(i)?' black':'');b.textContent=n[0];b.onclick=()=>{audio.resume();let o=audio.createOscillator(),g=audio.createGain();o.frequency.value=n[2];o.type='sine';g.gain.setValueAtTime(.0001,audio.currentTime);g.gain.exponentialRampToValueAtTime(.18,audio.currentTime+.02);g.gain.exponentialRampToValueAtTime(.0001,audio.currentTime+.65);o.connect(g).connect(audio.destination);o.start();o.stop(audio.currentTime+.7);$('#lastNote').textContent='Nota tocada: '+n[0]+' ('+n[1]+')'};$('#keyboard').appendChild(b)});
+let metroTimer=null;$('#metro').onclick=()=>{if(metroTimer){clearInterval(metroTimer);metroTimer=null;$('#metro').textContent='Iniciar';return}let bpm=Math.max(30,Math.min(240,Number($('#bpm').value)||80));let on=false;metroTimer=setInterval(()=>{on=!on;$('#beat').textContent=on?'●':'○';if(on){audio.resume();let o=audio.createOscillator(),g=audio.createGain();o.frequency.value=880;g.gain.value=.08;o.connect(g).connect(audio.destination);o.start();o.stop(audio.currentTime+.06)}},60000/bpm);$('#metro').textContent='Parar'};
+const chrom=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];$('#transpose').onclick=()=>{let n=Math.max(-11,Math.min(11,Number($('#semitones').value)||0));$('#transposeResult').textContent='C → '+chrom[(n+12)%12]};
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+</script>
+</body>
+</html>
