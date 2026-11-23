@@ -26,14 +26,69 @@ textarea{min-height:75px;resize:vertical}.row{display:flex;gap:9px;align-items:c
 .keys{display:flex;gap:2px;height:145px;margin:14px 0;position:relative}.key{flex:1;min-width:0;background:#f4f7fc;border:1px solid #9aa8b8;border-radius:0 0 6px 6px;color:#18243a;display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;font-size:10px}.key.black{background:#14243d;color:white;height:88px;flex:.62;margin:0 -12px;z-index:2;border:1px solid #52627a}.key:active{background:#9bd4ff}
 .note{font-size:28px;color:var(--cyan);font-weight:700}.beatdot{font-size:25px;color:var(--cyan)}.danger{color:#ffbd83}.success{color:var(--good)}footer{text-align:center;color:var(--muted);font-size:11px;padding:20px}
 @media(min-width:650px){.stats{grid-template-columns:repeat(4,1fr)}}
+
+/* Professor de Teclado — estilos isolados */
+#professor .prof-hero{background:linear-gradient(130deg,#12365b,#10213a);border:1px solid #32618e;border-radius:17px;padding:17px;margin:12px 0}
+#professor .prof-status{display:flex;align-items:center;gap:8px;color:var(--cyan);font-size:12px;font-weight:700}
+#professor .prof-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+#professor .prof-module{background:#091a30;border:1px solid var(--line);border-radius:13px;padding:12px;min-width:0}
+#professor .prof-module strong{display:block;margin:5px 0;color:var(--text)}
+#professor .prof-module p{font-size:12px;margin:5px 0 0;line-height:1.4}
+#professor .prof-number{color:var(--cyan);font-size:11px;letter-spacing:1px}
+#professor .prof-track{height:8px;background:#071225;border-radius:99px;overflow:hidden;margin:10px 0}
+#professor .prof-track span{display:block;width:0;height:100%;background:var(--good)}
+#professor .prof-note{border:1px solid #80653a;background:#302718;border-radius:12px;padding:12px;color:#f5d9a5;font-size:13px;line-height:1.5}
+@media(max-width:480px){#professor .prof-grid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
 <header><div class="eyebrow">Seu laboratório musical</div><h1>Piano Assistant</h1><p>Teoria, prática, repertório e evolução — no seu ritmo.</p></header>
 <nav aria-label="Navegação principal">
-<button class="active" data-tab="inicio">Início</button><button data-tab="teoria">Teoria</button><button data-tab="repertorio">Repertório</button><button data-tab="progresso">Progresso</button><button data-tab="ferramentas">Ferramentas</button>
+<button class="active" data-tab="inicio">Início</button><button data-tab="teoria">Teoria</button><button data-tab="repertorio">Repertório</button><button data-tab="progresso">Progresso</button><button data-tab="ferramentas">Ferramentas</button><button data-tab="professor">Professor</button>
 </nav>
 <main>
+
+<section id="professor" class="tab">
+ <div class="prof-hero">
+  <div class="eyebrow">Treinamento adaptativo</div>
+  <h2>Professor de Teclado</h2>
+  <p style="color:#d4e6f8">Uma avaliação prática e progressiva para descobrir o que você realmente consegue executar no teclado. O professor ajustará a dificuldade conforme suas respostas.</p>
+  <div class="prof-status"><span>●</span> Modo: avaliação completa · Correções imediatas</div>
+ </div>
+ <div class="card">
+  <h3>Seu diagnóstico</h3>
+  <div class="stats">
+   <div class="stat"><strong id="profLevel">A definir</strong><small>Nível atual</small></div>
+   <div class="stat"><strong id="profProgress">0/6</strong><small>Módulos avaliados</small></div>
+   <div class="stat"><strong id="profAccuracy">—</strong><small>Precisão geral</small></div>
+   <div class="stat"><strong id="profExercises">0</strong><small>Exercícios concluídos</small></div>
+  </div>
+  <div class="prof-track"><span id="profProgressBar"></span></div>
+  <p class="muted" id="profSummary">Sua avaliação ainda não começou. Os resultados serão registrados conforme os módulos forem concluídos.</p>
+ </div>
+ <div class="card">
+  <h3>Trilha de avaliação</h3>
+  <p>Os módulos serão liberados em sequência. O nível de dificuldade poderá subir ou descer conforme seu desempenho.</p>
+  <div class="prof-grid">
+   <div class="prof-module"><span class="prof-number">MÓDULO 01</span><strong>Notas musicais</strong><p>Notas naturais, sustenidos, bemóis e reconhecimento de alturas.</p><span class="pill">Fundamentos</span></div>
+   <div class="prof-module"><span class="prof-number">MÓDULO 02</span><strong>Intervalos e acordes</strong><p>Distâncias, tríades, tétrades, inversões e identificação de notas simultâneas.</p><span class="pill">Harmonia básica</span></div>
+   <div class="prof-module"><span class="prof-number">MÓDULO 03</span><strong>Escalas e tonalidades</strong><p>Escalas maiores e menores, graus, armaduras e campos harmônicos.</p><span class="pill">Teoria aplicada</span></div>
+   <div class="prof-module"><span class="prof-number">MÓDULO 04</span><strong>Harmonia</strong><p>Progressões, funções, cadências e relações entre acordes.</p><span class="pill">Construção musical</span></div>
+   <div class="prof-module"><span class="prof-number">MÓDULO 05</span><strong>Execução prática</strong><p>Precisão, coordenação das mãos, ritmo e continuidade.</p><span class="pill">Técnica</span></div>
+   <div class="prof-module"><span class="prof-number">MÓDULO 06</span><strong>Aplicação musical</strong><p>Leitura, sequências e aplicação dos conhecimentos em pequenos trechos.</p><span class="pill">Integração</span></div>
+  </div>
+ </div>
+ <div class="card">
+  <h3>Como será a correção</h3>
+  <div class="item"><b>1. O professor apresenta um desafio</b><p>Exemplo: tocar uma nota específica ou formar um acorde solicitado.</p></div>
+  <div class="item"><b>2. Você executa no teclado</b><p>O sistema deverá captar o som e analisar notas isoladas ou simultâneas.</p></div>
+  <div class="item"><b>3. Correção imediata</b><p>Você receberá o que acertou, o que precisa corrigir e uma explicação objetiva.</p></div>
+  <div class="item"><b>4. Dificuldade adaptativa</b><p>O próximo desafio será escolhido conforme o resultado anterior.</p></div>
+ </div>
+ <div class="prof-note"><b>Etapa inicial — interface pronta.</b><br>Esta atualização cria a área do professor e organiza a avaliação. O reconhecimento de áudio polifônico e a correção automática ainda serão implementados em uma etapa técnica separada. Nenhum teste auditivo será apresentado como funcional antes de essa análise estar pronta.</div>
+</section>
+
 <section id="inicio" class="tab active">
 <div class="card"><div class="eyebrow">Painel de estudo</div><h2>Seu próximo passo musical</h2><p>Estude um conceito, pratique no teclado e registre o que aprendeu. O progresso exibido vem dos seus registros neste aparelho.</p><button class="btn primary" onclick="showTab('teoria')">Estudar teoria</button></div>
 <div class="stats"><div class="stat"><strong id="sessions">0</strong>Sessões</div><div class="stat"><strong id="minutes">0</strong>Minutos</div><div class="stat"><strong id="songs">0</strong>Músicas</div><div class="stat"><strong id="days">0</strong>Dias estudados</div></div>
