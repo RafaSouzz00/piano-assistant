@@ -92,6 +92,20 @@ textarea{min-height:75px;resize:vertical}.row{display:flex;gap:9px;align-items:c
 .adaptive-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .adaptive-note{font-size:.86rem;color:var(--muted)}
 @media(max-width:480px){.adaptive-grid{grid-template-columns:1fr 1fr}}
+
+/* Treinamento de intervalos — módulo independente */
+#intervalTrainer .interval-levels{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin:12px 0}
+#intervalTrainer .interval-level{border:1px solid var(--line);border-radius:10px;background:#0a1b30;color:var(--text);padding:9px 5px;text-align:center;font-size:11px;cursor:pointer}
+#intervalTrainer .interval-level.active{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan) inset}
+#intervalTrainer .interval-level.done{border-color:#287c61}
+#intervalTrainer .interval-level:disabled{opacity:.42;cursor:not-allowed}
+#intervalTrainer .interval-level b{display:block;font-size:14px;margin-bottom:3px}
+#intervalTrainer .interval-chip{display:inline-block;padding:5px 8px;margin:3px;border-radius:8px;background:#0c2238;border:1px solid var(--line);color:var(--cyan);font-weight:700}
+#intervalTrainer .interval-question{padding:12px 0;border-top:1px solid var(--line)}
+#intervalTrainer .interval-question label{display:flex;gap:8px;align-items:center;padding:7px;border-radius:8px;cursor:pointer}
+#intervalTrainer .interval-question label:has(input:checked){background:#173451}
+@media(max-width:480px){#intervalTrainer .interval-levels{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
 </style>
 </head>
 <body>
@@ -156,7 +170,25 @@ textarea{min-height:75px;resize:vertical}.row{display:flex;gap:9px;align-items:c
   <p class="academy-muted">O progresso fica salvo neste aparelho. Para exercícios de execução, use seu teclado físico; a lista de verificação é uma autoavaliação, não uma medição automática de técnica ou ritmo.</p>
  </div>
 
- <div class="eyebrow" style="margin:18px 2px 8px">04 · Laboratório prático</div>
+
+ <div class="eyebrow" style="margin:18px 2px 8px">04 · Treinamento progressivo</div>
+ <div class="card" id="intervalTrainer">
+  <div class="academy-head"><div><h3>Treinamento de intervalos</h3><p class="muted">Aprenda a reconhecer distâncias entre notas e avance por etapas. É necessário atingir 75% para desbloquear a próxima fase.</p></div><span class="pill" id="intervalOverall">0/5 etapas</span></div>
+  <div class="academy-progress"><span id="intervalOverallBar"></span></div>
+  <div class="interval-levels" id="intervalLevelList" aria-label="Etapas do treinamento"></div>
+  <div class="academy-content">
+   <div class="academy-head"><div><span class="prof-number" id="intervalKicker">ETAPA 01</span><h3 id="intervalTitle">Primeiros passos</h3></div><span class="pill" id="intervalStatus">Disponível</span></div>
+   <p id="intervalGoal" class="muted"></p>
+   <div class="academy-lesson"><h4>Aprenda</h4><div id="intervalLesson"></div></div>
+   <div class="academy-lesson"><h4>Pratique no teclado</h4><div id="intervalPractice"></div></div>
+   <div class="academy-lesson"><h4>Desafio da etapa</h4><p class="academy-muted">Responda às quatro questões. Você precisa acertar pelo menos três para concluir.</p><div id="intervalQuiz"></div><button class="btn primary" id="intervalGrade" type="button">Corrigir desafio</button><div id="intervalFeedback" aria-live="polite"></div></div>
+   <div class="academy-actions"><button class="btn" id="intervalReset" type="button">Recomeçar treinamento</button></div>
+  </div>
+  <p class="academy-muted">O curso ensina pela distância em semitons e pela identificação dos nomes dos intervalos. A prática no instrumento é orientada; esta versão não usa microfone nem altera os recursos de áudio.</p>
+ </div>
+
+ <div class="eyebrow" style="margin:18px 2px 8px">05 · Laboratório prático</div>
+
  <div class="card" id="profPolyphonic">
   <h3>Reconhecimento de acordes e inversões</h3>
   <p>Toque o acorde solicitado no seu teclado. O analisador identifica várias notas simultâneas e compara as classes de notas encontradas com o acorde esperado.</p>
@@ -557,6 +589,75 @@ $('#recordPlay').onclick=()=>{if(recordBlob){let u=URL.createObjectURL(recordBlo
  window.addEventListener('academyResultsUpdated',render);
  render();
 })();
+
+
+// Treinamento progressivo de intervalos. Independente dos recursos de áudio.
+(()=>{
+ const $=id=>document.getElementById(id),KEY='pianoAssistant_interval_course_v1';
+ const stages=[
+  {title:'Primeiros passos',level:'Iniciante',goal:'Entenda o que é a distância entre duas notas e reconheça os intervalos mais curtos.',lesson:'<p><b>Intervalo</b> é a distância entre duas notas. No teclado, cada tecla vizinha (branca ou preta) representa um semitom.</p><p><span class="interval-chip">0 semitons · Uníssono</span><span class="interval-chip">1 · 2ª menor</span><span class="interval-chip">2 · 2ª maior</span></p><p>Exemplos: Dó–Dó é uníssono; Dó–Ré♭ é segunda menor; Dó–Ré é segunda maior.</p>',practice:'<ol><li>Escolha Dó como primeira nota.</li><li>Toque Dó e depois a tecla imediatamente à direita: conte 1 semitom.</li><li>Toque Dó e depois Ré: conte 2 semitons.</li><li>Repita começando em outras notas.</li></ol>',qs:[
+  ['Quantos semitons existem entre Dó e Ré♭?',['0','1','2','3'],1,'Dó–Ré♭ corresponde a um semitom: segunda menor.'],
+  ['Dó–Ré é qual intervalo?',['Uníssono','Segunda menor','Segunda maior','Terça menor'],2,'Dó até Ré soma dois semitons, formando uma segunda maior.'],
+  ['Duas notas com a mesma altura formam:',['Uníssono','Segunda maior','Terça menor','Quarta justa'],0,'Quando as duas notas têm a mesma altura, a distância é de zero semitons: uníssono.'],
+  ['Quantos semitons há em uma segunda menor?',['0','1','2','3'],1,'A segunda menor corresponde a um semitom.']
+ ]},
+  {title:'Terças e quarta',level:'Básico',goal:'Diferencie terça menor, terça maior e quarta justa.',lesson:'<p>As terças são importantes na construção de acordes. A terça menor tem 3 semitons; a terça maior tem 4. A quarta justa tem 5 semitons.</p><p><span class="interval-chip">3 · 3ª menor</span><span class="interval-chip">4 · 3ª maior</span><span class="interval-chip">5 · 4ª justa</span></p><p>Exemplos a partir de Dó: Mi♭ (terça menor), Mi (terça maior) e Fá (quarta justa).</p>',practice:'<ol><li>Toque Dó–Mi♭ e conte três semitons.</li><li>Toque Dó–Mi e conte quatro.</li><li>Toque Dó–Fá e conte cinco.</li><li>Alterne os pares e diga o nome antes de tocar.</li></ol>',qs:[
+  ['Dó–Mi♭ forma qual intervalo?',['Segunda maior','Terça menor','Terça maior','Quarta justa'],1,'Dó–Mi♭ tem três semitons: terça menor.'],
+  ['Quantos semitons formam uma terça maior?',['2','3','4','5'],2,'A terça maior tem quatro semitons.'],
+  ['Dó–Fá é uma:',['Terça menor','Terça maior','Quarta justa','Quinta justa'],2,'Dó–Fá corresponde a cinco semitons e é uma quarta justa.'],
+  ['Qual é a diferença entre terça menor e terça maior?',['1 semitom','2 semitons','3 semitons','5 semitons'],0,'A terça maior tem quatro semitons e a menor três: diferença de um semitom.']
+ ]},
+  {title:'Quinta e trítono',level:'Intermediário',goal:'Reconheça a quarta aumentada/trítono e a quinta justa.',lesson:'<p>O trítono tem seis semitons. A quinta justa tem sete. O trítono divide a oitava em duas partes iguais; a quinta justa é uma referência importante na harmonia.</p><p><span class="interval-chip">6 · Trítono</span><span class="interval-chip">7 · 5ª justa</span></p><p>Exemplos a partir de Dó: Fá♯ é trítono; Sol é quinta justa.</p>',practice:'<ol><li>Toque Dó–Fá♯ e conte seis semitons.</li><li>Toque Dó–Sol e conte sete.</li><li>Compare as duas distâncias lentamente.</li><li>Repita a partir de outra nota inicial.</li></ol>',qs:[
+  ['Quantos semitons há em um trítono?',['5','6','7','8'],1,'O trítono corresponde a seis semitons.'],
+  ['Dó–Sol forma qual intervalo?',['Quarta justa','Trítono','Quinta justa','Sexta menor'],2,'Dó até Sol soma sete semitons: quinta justa.'],
+  ['Qual nota está a seis semitons acima de Dó?',['Mi','Fá','Fá♯','Sol'],2,'Dó até Fá♯ percorre seis semitons.'],
+  ['A quinta justa tem quantos semitons?',['5','6','7','8'],2,'A quinta justa corresponde a sete semitons.']
+ ]},
+  {title:'Sextas e sétimas',level:'Avançado',goal:'Amplie o reconhecimento até a oitava, incluindo sextas e sétimas.',lesson:'<p>Agora trabalharemos distâncias maiores: sexta menor (8), sexta maior (9), sétima menor (10), sétima maior (11) e oitava justa (12 semitons).</p><p><span class="interval-chip">8 · 6ª menor</span><span class="interval-chip">9 · 6ª maior</span><span class="interval-chip">10 · 7ª menor</span><span class="interval-chip">11 · 7ª maior</span><span class="interval-chip">12 · Oitava</span></p><p>A oitava repete o nome da nota em uma região mais aguda.</p>',practice:'<ol><li>A partir de Dó, toque Lá♭ (sexta menor) e Lá (sexta maior).</li><li>Toque Si♭ (sétima menor) e Si (sétima maior).</li><li>Finalize em Dó uma oitava acima.</li><li>Conte os semitons e diga o nome de cada intervalo.</li></ol>',qs:[
+  ['Quantos semitons formam uma sexta maior?',['8','9','10','11'],1,'A sexta maior corresponde a nove semitons.'],
+  ['Dó–Si♭ forma uma:',['Sexta maior','Sétima menor','Sétima maior','Oitava'],1,'Dó até Si♭ soma dez semitons: sétima menor.'],
+  ['Qual intervalo corresponde a 11 semitons?',['Sexta menor','Sexta maior','Sétima menor','Sétima maior'],3,'A sétima maior tem onze semitons.'],
+  ['Uma oitava justa possui:',['7 semitons','10 semitons','11 semitons','12 semitons'],3,'A oitava justa equivale a doze semitons.']
+ ]},
+  {title:'Desafio integrado',level:'Especialista',goal:'Misture os intervalos, varie as notas iniciais e consolide o reconhecimento.',lesson:'<p>Na etapa final, o ponto de partida muda. Não dependa apenas de memorizar Dó como referência: use a distância entre as teclas e o nome das notas.</p><p>Revise a sequência: 0 uníssono; 1 segunda menor; 2 segunda maior; 3 terça menor; 4 terça maior; 5 quarta justa; 6 trítono; 7 quinta justa; 8 sexta menor; 9 sexta maior; 10 sétima menor; 11 sétima maior; 12 oitava.</p>',practice:'<ol><li>Escolha uma nota inicial aleatória.</li><li>Construa um intervalo pedido contando semitons.</li><li>Repita em movimento descendente: comece na nota mais aguda e volte à mais grave.</li><li>Ao final, toque uma sequência de quatro intervalos sem consultar a tabela.</li></ol>',qs:[
+  ['De Ré até Fá há quantos semitons e qual intervalo?',['2 · segunda maior','3 · terça menor','4 · terça maior','5 · quarta justa'],1,'Ré–Mi♭–Mi–Fá percorre três semitons: terça menor.'],
+  ['De Sol até Ré (acima) temos:',['Trítono','Quinta justa','Sexta menor','Sétima menor'],1,'Sol até Ré acima soma sete semitons: quinta justa.'],
+  ['Qual é o nome do intervalo de 8 semitons?',['Quinta justa','Sexta menor','Sexta maior','Sétima menor'],1,'Oito semitons formam uma sexta menor.'],
+  ['De Mi até Fá♯ há:',['1 semitom · segunda menor','2 semitons · segunda maior','3 semitons · terça menor','4 semitons · terça maior'],1,'Mi–Fá é um semitom e Fá–Fá♯ mais um: total de dois semitons, segunda maior.']
+ ]}
+ ];
+ let current=0,stored={};
+ try{stored=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){stored={}}
+ const results=()=>stored.results||{};
+ const unlocked=()=>{let n=0;for(let i=0;i<stages.length;i++){if(i===0||results()[i-1]?.passed)n++;else break;}return n;};
+ function save(){try{localStorage.setItem(KEY,JSON.stringify(stored))}catch(e){}}
+ function renderList(){
+  $('intervalLevelList').innerHTML=stages.map((st,i)=>{const r=results()[i],lock=i>=unlocked();return `<button type="button" class="interval-level ${i===current?'active':''} ${r?.passed?'done':''}" data-ilevel="${i}" ${lock?'disabled':''}><b>${String(i+1).padStart(2,'0')}</b>${st.level}<small>${r?.passed?'Concluída':lock?'Bloqueada':'Disponível'}</small></button>`}).join('');
+  $('intervalLevelList').querySelectorAll('[data-ilevel]').forEach(b=>b.addEventListener('click',()=>{current=Number(b.dataset.ilevel);render()}));
+ }
+ function render(){
+  const st=stages[current],r=results()[current],done=stages.filter((x,i)=>results()[i]?.passed).length;
+  $('intervalOverall').textContent=done+'/5 etapas';$('intervalOverallBar').style.width=(done/5*100)+'%';
+  $('intervalKicker').textContent='ETAPA '+String(current+1).padStart(2,'0');$('intervalTitle').textContent=st.title;$('intervalStatus').textContent=r?.passed?'Concluída · '+r.score+'%':r?'Em revisão':'Disponível';
+  $('intervalGoal').textContent=st.goal;$('intervalLesson').innerHTML=st.lesson;$('intervalPractice').innerHTML=st.practice;
+  $('intervalQuiz').innerHTML=st.qs.map((q,i)=>`<div class="interval-question"><b>${i+1}. ${q[0]}</b>${q[1].map((v,j)=>`<label><input type="radio" name="intervalQ${i}" value="${j}"><span>${v}</span></label>`).join('')}</div>`).join('');
+  $('intervalFeedback').innerHTML=r?`<div class="academy-result ${r.passed?'good':'bad'}">Último resultado: <b>${r.score}%</b> (${r.correct}/4). ${r.passed?'Etapa concluída.':'Você pode revisar e tentar novamente.'}</div>`:'';
+  renderList();
+ }
+ $('intervalGrade').addEventListener('click',()=>{
+  const st=stages[current],missing=[],answers=[];let correct=0;
+  st.qs.forEach((q,i)=>{const a=document.querySelector(`input[name="intervalQ${i}"]:checked`);if(!a)missing.push(i+1);else{const v=Number(a.value);answers.push(v);if(v===q[2])correct++;}});
+  if(missing.length){$('intervalFeedback').innerHTML=`<div class="academy-result bad">Responda todas as questões. Faltam: ${missing.join(', ')}.</div>`;return;}
+  const score=Math.round(correct/4*100),passed=score>=75,old=results()[current]||{attempts:0};
+  stored.results=stored.results||{};stored.results[current]={score,correct,passed,attempts:(old.attempts||0)+1,lastAt:new Date().toISOString()};save();
+  $('intervalFeedback').innerHTML=`<div class="academy-result ${passed?'good':'bad'}"><h4>Resultado: ${score}%</h4><p>${correct}/4 respostas corretas. ${passed?'Etapa concluída! A próxima etapa foi desbloqueada.':'Para avançar, alcance pelo menos 75%. Revise as explicações e tente novamente.'}</p>${st.qs.map((q,i)=>`<p><b>${answers[i]===q[2]?'Acertou.':'Reveja.'}</b> ${q[3]}</p>`).join('')}</div>`;
+  renderList();$('intervalOverall').textContent=stages.filter((x,i)=>results()[i]?.passed).length+'/5 etapas';$('intervalOverallBar').style.width=(stages.filter((x,i)=>results()[i]?.passed).length/5*100)+'%';
+  $('intervalStatus').textContent=passed?'Concluída · '+score+'%':'Em revisão';
+ });
+ $('intervalReset').addEventListener('click',()=>{if(!confirm('Deseja apagar somente o progresso do Treinamento de Intervalos?'))return;stored={results:{}};save();current=0;render();});
+ render();
+})();
+
 
 // Professor de Teclado: captura e análise polifônica em pipeline próprio.
 // Não reutiliza nem modifica micStream, micAnalyser, micRAF ou o gravador existentes.
