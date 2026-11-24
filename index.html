@@ -13,9 +13,10 @@
 :root{--bg:#071225;--panel:#10213a;--panel2:#142b49;--blue:#398be0;--cyan:#82dfff;--text:#f0f6ff;--muted:#a7b8ce;--line:#2a4262;--good:#58d6a0}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(155deg,#071225,#10213a 60%,#071225);color:var(--text);font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 header{padding:25px 18px 16px;background:radial-gradient(ellipse at 85% 0%,#194b7b 0,transparent 58%)}h1{font-size:28px;margin:7px 0}.eyebrow{font-size:11px;letter-spacing:2px;color:var(--cyan);text-transform:uppercase}
-nav{display:flex;gap:7px;overflow:auto;padding:9px 12px 13px;position:sticky;top:0;z-index:5;background:#081326ed;backdrop-filter:blur(12px)}
+nav{display:flex;gap:10px;overflow-x:auto;padding:9px 12px 13px;position:sticky;top:0;z-index:5;background:#081326ed;backdrop-filter:blur(12px);align-items:stretch;scrollbar-width:thin}
 nav button,.btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:11px;padding:10px 13px;font-weight:650;white-space:nowrap}
 nav button.active,.btn.primary{background:#174e85;border-color:#398be0}
+@media(max-width:480px){nav button{padding:9px 10px;font-size:12px}}
 main{max-width:900px;margin:auto;padding:3px 13px 100px}.tab{display:none}.tab.active{display:block}
 .card{background:linear-gradient(145deg,#122744,#0d1c31);border:1px solid var(--line);border-radius:17px;padding:16px;margin:12px 0;box-shadow:0 9px 26px #0002}
 h2{font-size:19px;margin:2px 0 12px}h3{font-size:15px;margin:0 0 9px}p{color:var(--muted);line-height:1.5}.muted,small{color:var(--muted)}
@@ -84,7 +85,12 @@ textarea{min-height:75px;resize:vertical}.row{display:flex;gap:9px;align-items:c
 <body>
 <header><div class="eyebrow">Seu laboratório musical</div><h1>Piano Assistant</h1><p>Teoria, prática, repertório e evolução — no seu ritmo.</p></header>
 <nav aria-label="Navegação principal">
-<button class="active" data-tab="inicio">Início</button><button data-tab="teoria">Teoria</button><button data-tab="repertorio">Repertório</button><button data-tab="progresso">Progresso</button><button data-tab="ferramentas">Ferramentas</button><button data-tab="professor">Professor</button>
+ <button data-tab="inicio" class="active">Início</button>
+ <button data-tab="professor">Professor</button>
+ <button data-tab="teoria">Teoria</button>
+ <button data-tab="repertorio">Repertório</button>
+ <button data-tab="progresso">Progresso</button>
+ <button data-tab="ferramentas">Ferramentas</button>
 </nav>
 <main>
 
