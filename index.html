@@ -98,11 +98,12 @@ textarea{min-height:75px;resize:vertical}.row{display:flex;gap:9px;align-items:c
  <div class="prof-hero">
   <div class="eyebrow">Treinamento adaptativo</div>
   <h2>Professor de Teclado</h2>
-  <p style="color:#d4e6f8">Uma avaliação prática e progressiva para descobrir o que você realmente consegue executar no teclado. O professor ajustará a dificuldade conforme suas respostas.</p>
+  <p style="color:#d4e6f8">Uma avaliação prática e progressiva para descobrir o que você realmente consegue executar no teclado. Você poderá avançar pelos módulos e revisar os conteúdos conforme seus resultados.</p>
   <div class="prof-status"><span>●</span> Modo: avaliação completa · Correções imediatas</div>
  </div>
  <div class="card">
-  <h3>Seu diagnóstico</h3>
+  <div class="eyebrow">01 · Acompanhamento</div>
+  <h3>Seu progresso</h3>
   <div class="stats">
    <div class="stat"><strong id="profLevel">A definir</strong><small>Nível atual</small></div>
    <div class="stat"><strong id="profProgress">0/6</strong><small>Módulos avaliados</small></div>
@@ -112,29 +113,10 @@ textarea{min-height:75px;resize:vertical}.row{display:flex;gap:9px;align-items:c
   <div class="prof-track"><span id="profProgressBar"></span></div>
   <p class="muted" id="profSummary">Sua avaliação ainda não começou. Os resultados serão registrados conforme os módulos forem concluídos.</p>
  </div>
- <div class="card">
-  <h3>Trilha de avaliação</h3>
-  <p>Os módulos serão liberados em sequência. O nível de dificuldade poderá subir ou descer conforme seu desempenho.</p>
-  <div class="prof-grid">
-   <div class="prof-module"><span class="prof-number">MÓDULO 01</span><strong>Notas musicais</strong><p>Notas naturais, sustenidos, bemóis e reconhecimento de alturas.</p><span class="pill">Fundamentos</span></div>
-   <div class="prof-module"><span class="prof-number">MÓDULO 02</span><strong>Intervalos e acordes</strong><p>Distâncias, tríades, tétrades, inversões e identificação de notas simultâneas.</p><span class="pill">Harmonia básica</span></div>
-   <div class="prof-module"><span class="prof-number">MÓDULO 03</span><strong>Escalas e tonalidades</strong><p>Escalas maiores e menores, graus, armaduras e campos harmônicos.</p><span class="pill">Teoria aplicada</span></div>
-   <div class="prof-module"><span class="prof-number">MÓDULO 04</span><strong>Harmonia</strong><p>Progressões, funções, cadências e relações entre acordes.</p><span class="pill">Construção musical</span></div>
-   <div class="prof-module"><span class="prof-number">MÓDULO 05</span><strong>Execução prática</strong><p>Precisão, coordenação das mãos, ritmo e continuidade.</p><span class="pill">Técnica</span></div>
-   <div class="prof-module"><span class="prof-number">MÓDULO 06</span><strong>Aplicação musical</strong><p>Leitura, sequências e aplicação dos conhecimentos em pequenos trechos.</p><span class="pill">Integração</span></div>
-  </div>
- </div>
- <div class="card">
-  <h3>Como será a correção</h3>
-  <div class="item"><b>1. O professor apresenta um desafio</b><p>Exemplo: tocar uma nota específica ou formar um acorde solicitado.</p></div>
-  <div class="item"><b>2. Você executa no teclado</b><p>O sistema deverá captar o som e analisar notas isoladas ou simultâneas.</p></div>
-  <div class="item"><b>3. Correção imediata</b><p>Você receberá o que acertou, o que precisa corrigir e uma explicação objetiva.</p></div>
-  <div class="item"><b>4. Dificuldade adaptativa</b><p>O próximo desafio será escolhido conforme o resultado anterior.</p></div>
- </div>
-
+ <div class="eyebrow" style="margin:18px 2px 8px">02 · Formação musical</div>
 
  <div class="card academy-shell" id="profAcademy">
-  <div class="academy-head"><div><h3>Escola de Teclado · Formação completa</h3><p class="muted">Seis módulos independentes. Estude a aula, pratique e faça a avaliação de cada etapa.</p></div><span class="pill" id="academyOverall">0/6 concluídos</span></div>
+  <div class="academy-head"><div><h3>Curso de teclado · 6 módulos</h3><p class="muted">Seis módulos independentes. Estude a aula, pratique e faça a avaliação de cada etapa.</p></div><span class="pill" id="academyOverall">0/6 concluídos</span></div>
   <div class="academy-progress"><span id="academyOverallBar"></span></div>
   <div class="academy-select" id="academyModuleList" aria-label="Selecionar módulo"></div>
   <div class="academy-content">
@@ -148,8 +130,9 @@ textarea{min-height:75px;resize:vertical}.row{display:flex;gap:9px;align-items:c
   <p class="academy-muted">O progresso fica salvo neste aparelho. Para exercícios de execução, use seu teclado físico; a lista de verificação é uma autoavaliação, não uma medição automática de técnica ou ritmo.</p>
  </div>
 
+ <div class="eyebrow" style="margin:18px 2px 8px">03 · Laboratório prático</div>
  <div class="card" id="profPolyphonic">
-  <h3>Etapa 2 — Reconhecimento de acordes</h3>
+  <h3>Reconhecimento de acordes e inversões</h3>
   <p>Toque o acorde solicitado no seu teclado. O analisador identifica várias notas simultâneas e compara as classes de notas encontradas com o acorde esperado.</p>
   <div class="prof-audio-panel">
    <div class="row">
@@ -200,7 +183,7 @@ textarea{min-height:75px;resize:vertical}.row{display:flex;gap:9px;align-items:c
 <section id="progresso" class="tab">
 <div class="card"><h2>Registrar sessão</h2><label>Minutos estudados</label><input id="studyMinutes" type="number" min="1" max="600" value="20"><label>Conteúdo estudado</label><input id="studyTopic" placeholder="Ex.: campo harmônico de Sol"><button class="btn primary" id="saveSession">Salvar sessão</button></div>
 <div class="card"><h2>Diário musical e histórico</h2><div id="history">Nenhuma sessão registrada.</div></div>
-<div class="card"><h2>Avaliação inicial / autoavaliação</h2><p>Marque o que já consegue fazer. Isso não é uma prova validada; serve para organizar seus estudos.</p><div id="assessment"></div><button class="btn" id="saveAssessment">Salvar autoavaliação</button><p id="assessmentResult" class="success"></p></div>
+
 </section>
 
 <section id="ferramentas" class="tab">
@@ -267,7 +250,7 @@ function render(){$('#sessions').textContent=data.sessions.length;$('#minutes').
 window.deleteSong=i=>{data.songs.splice(i,1);save()};
 $('#addSong').onclick=()=>{let name=$('#songName').value.trim();if(!name)return alert('Informe o nome da música.');data.songs.push({name,key:$('#songKey').value,artist:$('#songArtist').value,chords:$('#songChords').value,melody:$('#songMelody').value,lyrics:$('#songLyrics').value});['#songName','#songKey','#songArtist','#songChords','#songMelody','#songLyrics'].forEach(s=>$(s).value='');save()};
 $('#saveSession').onclick=()=>{let minutes=Math.max(1,Math.min(600,Number($('#studyMinutes').value)||20));data.sessions.push({minutes,topic:$('#studyTopic').value.trim()||'Estudo livre',date:new Date().toLocaleDateString('pt-BR')});$('#studyTopic').value='';save()};
-const assessments=['Reconheço as notas no teclado','Consigo tocar escalas maiores','Conheço tríades maiores e menores','Consigo tocar acordes com a mão esquerda','Consigo tocar uma melodia com a mão direita','Consigo manter o pulso com metrônomo'];$('#assessment').innerHTML=assessments.map((x,i)=>`<label><input type="checkbox" style="width:auto" id="a${i}"> ${x}</label>`).join('');$('#saveAssessment').onclick=()=>{data.assessment=assessments.map((x,i)=>$('#a'+i).checked);save();let n=data.assessment.filter(Boolean).length;$('#assessmentResult').textContent=`${n} de ${assessments.length} habilidades marcadas. Use isso para escolher seus próximos estudos.`};
+
 const plans=['Aquecimento: cinco minutos de notas e postura. Depois escala maior, tríades e uma música lenta.','Pratique a mão direita em frases curtas; depois faça os acordes da mão esquerda e una as mãos.','Estude uma escala menor, monte os acordes dos graus e pratique uma progressão em andamento lento.'];$('#newPlan').onclick=()=>$('#dailyPlan').textContent=plans[Math.floor(Math.random()*plans.length)];
 const challenges=['Toque uma escala maior em duas oitavas, subindo e descendo.','Monte os acordes I, IV e V de uma tonalidade que você escolher.','Toque uma progressão I–V–vi–IV com inversões suaves.','Pratique uma melodia curta com a mão direita e fundamentais na esquerda.'];$('#newChallenge').onclick=()=>$('#challenge').textContent=challenges[Math.floor(Math.random()*challenges.length)];
 render();
@@ -449,7 +432,7 @@ $('#recordPlay').onclick=()=>{if(recordBlob){let u=URL.createObjectURL(recordBlo
   const rs=results(),done=modules.filter((m,i)=>rs[i]&&rs[i].passed).length;
   $('academyOverall').textContent=done+'/6 concluídos';$('academyOverallBar').style.width=(done/6*100)+'%';
   $('profProgress').textContent=done+'/6';
-  const scores=modules.map((m,i)=>rs[i]&&rs[i].passed?rs[i].score:null).filter(v=>v!==null);
+  const scores=modules.map((m,i)=>rs[i]&&Number.isFinite(rs[i].score)?rs[i].score:null).filter(v=>v!==null);
   $('profAccuracy').textContent=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length)+'%':'—';
   $('profLevel').textContent=done===6?'Trilha concluída':done>=4?'Intermediário em desenvolvimento':done>=2?'Fundamentos em desenvolvimento':'Em avaliação';
   $('profExercises').textContent=modules.reduce((n,m,i)=>n+(rs[i]?.attempts||0),0);
