@@ -80,6 +80,18 @@ textarea{min-height:75px;resize:vertical}.row{display:flex;gap:9px;align-items:c
 #professor .academy-muted{color:var(--muted);font-size:12px}
 @media(max-width:480px){#professor .academy-select{grid-template-columns:1fr}}
 
+
+/* Professor adaptativo — estilos isolados */
+.adaptive-card{border:1px solid var(--line);background:linear-gradient(145deg,rgba(32,88,132,.10),rgba(15,25,42,.04))}
+.adaptive-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
+.adaptive-stat{background:var(--panel,rgba(255,255,255,.035));border:1px solid var(--line);border-radius:12px;padding:11px}
+.adaptive-stat b{display:block;font-size:1.05rem;margin-bottom:3px}
+.adaptive-stat small{color:var(--muted)}
+.adaptive-focus{border-left:3px solid var(--cyan);padding:9px 12px;margin:12px 0;background:rgba(40,180,210,.06);border-radius:0 10px 10px 0}
+.adaptive-steps{padding-left:20px;line-height:1.55}
+.adaptive-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.adaptive-note{font-size:.86rem;color:var(--muted)}
+@media(max-width:480px){.adaptive-grid{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -113,7 +125,21 @@ textarea{min-height:75px;resize:vertical}.row{display:flex;gap:9px;align-items:c
   <div class="prof-track"><span id="profProgressBar"></span></div>
   <p class="muted" id="profSummary">Sua avaliação ainda não começou. Os resultados serão registrados conforme os módulos forem concluídos.</p>
  </div>
- <div class="eyebrow" style="margin:18px 2px 8px">02 · Formação musical</div>
+ <div class="eyebrow" style="margin:18px 2px 8px">02 · Plano adaptativo</div>
+ <div class="card adaptive-card" id="adaptiveProfessor">
+  <div class="academy-head"><div><h3>Seu próximo exercício</h3><p class="muted">O plano usa seus resultados mais recentes para indicar o que revisar e ajustar a dificuldade.</p></div><span class="pill" id="adaptiveLevel">Inicial</span></div>
+  <div class="adaptive-grid">
+   <div class="adaptive-stat"><b id="adaptiveFocus">Notas musicais</b><small>Foco recomendado</small></div>
+   <div class="adaptive-stat"><b id="adaptiveCompleted">0</b><small>Práticas registradas</small></div>
+  </div>
+  <div class="adaptive-focus"><b id="adaptiveReason">Comece pelo primeiro módulo para estabelecer seu ponto de partida.</b><p id="adaptiveReview" class="muted" style="margin:6px 0 0">Faça a primeira avaliação para receber recomendações mais precisas.</p></div>
+  <h4 id="adaptiveExerciseTitle">Exercício inicial</h4>
+  <p id="adaptiveExerciseText">Comece identificando as notas naturais no teclado.</p>
+  <ol id="adaptiveSteps" class="adaptive-steps"><li>Localize Dó, Ré, Mi, Fá, Sol, Lá e Si.</li><li>Nomeie as notas enquanto toca lentamente.</li></ol>
+  <div class="adaptive-actions"><button class="btn primary" id="adaptiveDone" type="button">Concluir esta prática</button><button class="btn" id="adaptiveRefresh" type="button">Atualizar plano</button></div>
+  <p class="adaptive-note" id="adaptiveFeedback" aria-live="polite">Ao concluir, a prática será registrada neste aparelho. A dificuldade é ajustada por regras com base nas avaliações dos módulos.</p>
+ </div>
+ <div class="eyebrow" style="margin:18px 2px 8px">03 · Formação musical</div>
 
  <div class="card academy-shell" id="profAcademy">
   <div class="academy-head"><div><h3>Curso de teclado · 6 módulos</h3><p class="muted">Seis módulos independentes. Estude a aula, pratique e faça a avaliação de cada etapa.</p></div><span class="pill" id="academyOverall">0/6 concluídos</span></div>
@@ -130,7 +156,7 @@ textarea{min-height:75px;resize:vertical}.row{display:flex;gap:9px;align-items:c
   <p class="academy-muted">O progresso fica salvo neste aparelho. Para exercícios de execução, use seu teclado físico; a lista de verificação é uma autoavaliação, não uma medição automática de técnica ou ritmo.</p>
  </div>
 
- <div class="eyebrow" style="margin:18px 2px 8px">03 · Laboratório prático</div>
+ <div class="eyebrow" style="margin:18px 2px 8px">04 · Laboratório prático</div>
  <div class="card" id="profPolyphonic">
   <h3>Reconhecimento de acordes e inversões</h3>
   <p>Toque o acorde solicitado no seu teclado. O analisador identifica várias notas simultâneas e compara as classes de notas encontradas com o acorde esperado.</p>
@@ -456,6 +482,79 @@ $('#recordPlay').onclick=()=>{if(recordBlob){let u=URL.createObjectURL(recordBlo
  });
  $('academyPrev').addEventListener('click',()=>{if(current>0){current--;render();}});
  $('academyNext').addEventListener('click',()=>{if(current<modules.length-1){current++;render();}});
+ render();
+})();
+
+// Professor Adaptativo: recomenda foco e dificuldade usando os resultados já salvos.
+// Não acessa APIs de áudio, streams, detector, metrônomo ou gravador.
+(()=>{
+ const el=id=>document.getElementById(id);
+ const STORE='pianoAssistant_academy_v1',ADAPT='pianoAssistant_adaptive_v1';
+ const topics=[
+  {name:'Notas musicais',focus:'Localização e sequência das notas',review:'Revise a ordem das notas naturais e a localização dos sustenidos e bemóis.',levels:[
+   {title:'Reconhecimento guiado',text:'Encontre as notas naturais em uma região confortável do teclado.',steps:['Localize todos os grupos de duas teclas pretas e encontre o Dó à esquerda deles.','Toque Dó–Ré–Mi–Fá–Sol–Lá–Si lentamente, dizendo os nomes.','Escolha três notas aleatórias e localize-as sem começar sempre pelo Dó.']},
+   {title:'Memória das notas',text:'Reconheça notas sem depender de uma sequência fixa.',steps:['Escolha cinco notas diferentes e encontre cada uma em duas regiões do teclado.','Alterne notas naturais e teclas pretas, nomeando cada uma.','Repita em ordem aleatória, mantendo a execução confortável.']},
+   {title:'Aplicação no repertório',text:'Use a leitura das notas em uma pequena frase musical.',steps:['Escolha uma frase curta de uma música que você já conhece.','Identifique os nomes das notas antes de tocar.','Toque a frase lentamente e confira cada posição.']}
+  ]},
+  {name:'Intervalos e acordes',focus:'Construção de intervalos e tríades',review:'Revise semitons, tons, terça maior, terça menor e quinta justa.',levels:[
+   {title:'Intervalos fundamentais',text:'Construa distâncias a partir de uma nota de referência.',steps:['Escolha Dó como referência e conte os semitons até Mi e Sol.','Repita a construção começando em Ré e Fá.','Diga o nome do intervalo antes de tocar a segunda nota.']},
+   {title:'Montagem de tríades',text:'Compare acordes maiores e menores pela terça.',steps:['Monte Dó maior com Dó–Mi–Sol.','Altere Mi para Mi♭ e ouça Dó menor.','Repita em duas outras fundamentais.']},
+   {title:'Inversões e condução',text:'Mude a posição das notas sem perder a identidade do acorde.',steps:['Toque uma tríade na posição fundamental.','Leve a nota mais grave uma oitava acima para formar a primeira inversão.','Faça a segunda inversão e compare o movimento do baixo.']}
+  ]},
+  {name:'Escalas e tonalidades',focus:'Padrões de escala e graus',review:'Revise a fórmula de tons e semitons e a formação da escala maior.',levels:[
+   {title:'Escala em uma oitava',text:'Construa uma escala maior com atenção aos intervalos.',steps:['Toque Dó maior e observe o padrão T–T–ST–T–T–T–ST.','Repita em Sol maior, ajustando Fá para Fá sustenido.','Toque descendo e nomeie cada grau.']},
+   {title:'Transposição',text:'Reconstrua uma escala em outra tonalidade.',steps:['Escolha uma tonalidade diferente de Dó.','Monte a escala usando o padrão de tons e semitons.','Confira se a sétima nota está a um semitom da oitava.']},
+   {title:'Graus e campo harmônico',text:'Relacione as notas da escala aos acordes diatônicos.',steps:['Escolha uma escala maior.','Identifique os sete graus e forme tríades sobre cada nota.','Classifique cada acorde como maior, menor ou diminuto.']}
+  ]},
+  {name:'Harmonia',focus:'Funções e progressões harmônicas',review:'Revise tônica, subdominante, dominante e graus romanos.',levels:[
+   {title:'Identificação de funções',text:'Reconheça o papel dos acordes em uma tonalidade.',steps:['Em Dó maior, toque C, F e G.','Identifique C como tônica, F como subdominante e G como dominante.','Resolva G em C e observe a sensação de conclusão.']},
+   {title:'Progressão por graus',text:'Leia e toque uma sequência usando graus romanos.',steps:['Toque I–V–vi–IV em Dó maior: C–G–Am–F.','Diga o grau de cada acorde enquanto toca.','Transponha a sequência para Sol maior.']},
+   {title:'Análise comparativa',text:'Compare duas progressões e explique suas funções.',steps:['Toque ii–V–I em Dó maior.','Identifique a preparação, a tensão e a resolução.','Compare com I–V–vi–IV e descreva como termina cada sequência.']}
+  ]},
+  {name:'Execução prática',focus:'Coordenação, pulso e consistência',review:'Revise a prática com mãos separadas, andamento confortável e subdivisão.',levels:[
+   {title:'Coordenação inicial',text:'Estabeleça um pulso estável antes de unir as mãos.',steps:['Conte quatro tempos em voz alta.','Toque uma nota por tempo com a mão direita.','Toque uma nota longa com a esquerda e depois una as mãos devagar.']},
+   {title:'Pulso e independência',text:'Mantenha padrões diferentes entre as mãos.',steps:['Use andamento lento e regular.','Toque fundamentais na esquerda e uma sequência curta na direita.','Repita sem acelerar; priorize continuidade e conforto.']},
+   {title:'Fluidez musical',text:'Aplique dinâmica e transições entre acordes.',steps:['Escolha uma progressão de quatro acordes.','Pratique as mudanças com o menor movimento possível.','Repita variando suavemente a intensidade, sem perder o pulso.']}
+  ]},
+  {name:'Aplicação musical',focus:'Integração de teoria e repertório',review:'Revise como conectar tonalidade, acordes, melodia e acompanhamento.',levels:[
+   {title:'Aplicação orientada',text:'Use uma progressão conhecida para acompanhar uma melodia simples.',steps:['Escolha C–G–Am–F ou outra progressão estudada.','Toque as fundamentais na mão esquerda.','Toque tríades simples na direita, lentamente.']},
+   {title:'Acompanhamento',text:'Organize baixo, acordes e mudanças harmônicas.',steps:['Escolha uma música do seu repertório.','Identifique a sequência de acordes que você já conhece.','Monte um acompanhamento simples e mantenha o pulso.']},
+   {title:'Desafio integrado',text:'Combine análise, execução e criação musical.',steps:['Crie uma progressão de quatro acordes.','Identifique a tonalidade e os graus romanos.','Crie uma melodia curta original usando notas da escala.']}
+  ]}
+ ];
+ let currentPlan=null;
+ function read(key,fallback){try{return JSON.parse(localStorage.getItem(key)||'null')||fallback}catch(e){return fallback}}
+ function choosePlan(){
+  const data=read(STORE,{}),results=data.results||{},attempted=topics.map((t,i)=>({i,r:results[i]})).filter(x=>x.r&&Number.isFinite(Number(x.r.score)));
+  if(!attempted.length)return {index:0,level:0,reason:'Ainda não há avaliações registradas. Vamos começar pelo fundamento para estabelecer seu ponto de partida.',review:'Faça a avaliação de Notas musicais; depois o plano passará a considerar seu resultado.',label:'Fundamentos'};
+  const failed=attempted.filter(x=>Number(x.r.score)<80).sort((a,b)=>Number(a.r.score)-Number(b.r.score));
+  if(failed.length){const x=failed[0],score=Number(x.r.score);return {index:x.i,level:score<50?0:score<65?1:1,reason:`Sua última nota em ${topics[x.i].name} foi ${score}%. Esse conteúdo merece reforço antes de avançar.`,review:`Priorize: ${topics[x.i].review}`,label:score<50?'Reforço guiado':'Consolidação'};}
+  const next=topics.findIndex((t,i)=>!results[i]||!results[i].passed);
+  if(next>=0)return {index:next,level:1,reason:`Você atingiu a meta nos módulos avaliados. O próximo foco é ${topics[next].name}.`,review:`Consolide: ${topics[next].review}`,label:'Consolidação'};
+  const lowest=attempted.slice().sort((a,b)=>Number(a.r.score)-Number(b.r.score))[0];
+  if(lowest&&Number(lowest.r.score)<95)return {index:lowest.i,level:2,reason:`Você concluiu os módulos. Vamos aprofundar ${topics[lowest.i].name}, seu resultado relativamente mais baixo (${lowest.r.score}%).`,review:`Aprofunde: ${topics[lowest.i].review}`,label:'Aprofundamento'};
+  return {index:5,level:2,reason:'Você concluiu todos os módulos com resultados consistentes. Agora é hora de integrar os conhecimentos em uma atividade musical.',review:'Combine análise harmônica, acompanhamento e criação de uma pequena melodia original.',label:'Desafio integrado'};
+ }
+ function render(){
+  const plan=choosePlan(),topic=topics[plan.index],saved=read(ADAPT,{completed:0,variant:0});
+  const exercise=topic.levels[plan.level];currentPlan={index:plan.index,level:plan.level};
+  el('adaptiveLevel').textContent=plan.label;el('adaptiveFocus').textContent=topic.name;el('adaptiveCompleted').textContent=String(saved.completed||0);
+  el('adaptiveReason').textContent=plan.reason;el('adaptiveReview').textContent=plan.review;
+  el('adaptiveExerciseTitle').textContent=exercise.title;el('adaptiveExerciseText').textContent=exercise.text;
+  const variant=(Number(saved.variant)||0)%3,steps=exercise.steps.slice();
+  if(variant===1)steps.reverse();
+  if(variant===2)steps.push('Ao terminar, explique em voz alta o que percebeu e qual parte precisa de mais prática.');
+  el('adaptiveSteps').innerHTML=steps.map(x=>`<li>${x}</li>`).join('');
+  el('adaptiveFeedback').textContent='A recomendação é baseada nas avaliações mais recentes. A conclusão da prática é registrada por você.';
+ }
+ el('adaptiveDone').addEventListener('click',()=>{
+  const saved=read(ADAPT,{completed:0,variant:0});saved.completed=(Number(saved.completed)||0)+1;saved.variant=(Number(saved.variant)||0)+1;saved.lastModule=currentPlan?currentPlan.index:0;saved.lastAt=new Date().toISOString();
+  try{localStorage.setItem(ADAPT,JSON.stringify(saved))}catch(e){}
+  render();el('adaptiveFeedback').textContent='Prática registrada. O próximo exercício foi preparado; faça a avaliação do módulo para ajustar ainda mais a dificuldade.';
+ });
+ el('adaptiveRefresh').addEventListener('click',render);
+ el('academyGrade').addEventListener('click',render);
+ window.addEventListener('academyResultsUpdated',render);
  render();
 })();
 
